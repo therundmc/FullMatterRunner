@@ -11,6 +11,9 @@ var Engine = Matter.Engine,
     Common = Matter.Common,
     Bodies = Matter.Bodies,
     Bounds = Matter.Bounds;
+
+var windowWidht = 800;
+var windowHeight = 600;
     
 
 // create engine
@@ -24,8 +27,8 @@ var render = Render.create({
     element: document.body,
     engine: engine,
     options: {
-        width: 1000,
-        height: 1000,
+        width: windowWidht,
+        height: windowHeight,
         showVelocity: false,
 
         wireframes: false,

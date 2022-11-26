@@ -37,49 +37,26 @@ var render = Render.create({
     }
 });
 
-let map = [[2,2,2,2,2,2,2,2,2,2],
+var map = [[2,2,2,2,2,2,2,2,2,2],
 		   [3,1,1,1,1,1,1,1,1,5],
 		   [3,1,1,1,1,1,1,1,1,5],
 		   [3,1,1,1,1,1,1,1,1,5],
 		   [3,1,1,1,1,1,1,1,1,5],
 		   [3,1,1,1,1,1,1,1,1,5],
-		   [3,1,1,1,1,1,1,1,1,5],
-		   [3,1,1,1,1,1,1,1,1,5],
-		   [3,1,1,1,1,1,1,1,1,5],
-		   [4,4,4,4,4,4,4,4,4,4]]
+		   [3,4,4,4,6,4,5,1,1,5],
+		   [3,1,1,1,1,1,5,1,1,8],
+		   [3,1,1,1,1,1,5,1,1,5],
+		   [4,4,4,4,6,4,4,7,4,4]]
 		   
-let elemsToDraw = [];
+var elemsToDraw = [];
 
-init();
+mapInit();
 
-Composite.add(engine.world, elemsToDraw);
 
-function init()
-{
-	let k = 0;
-	for(let i = 0; i < 10; i++)
-	{
-		for(let j = 0; j < 10; j++)
-		{
-			if(map[j][i] == 1)	
-			elemsToDraw[k] =  Bodies.rectangle(i*100, j*100, 100, 100,  {  collisionFilter: { category: 0}, isStatic: true , render: { sprite: { texture: './assets/img/ground.png'}}});
-			else if(map[j][i] == 2)
-				elemsToDraw[k] = Bodies.rectangle(i*100, j*100 + 35, 100, 30, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_hori.png'}}});
-			else if(map[j][i] == 3)
-				elemsToDraw[k] = Bodies.rectangle(i*100 + 35, j*100, 30, 100, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_vert.png'}}});
-			else if(map[j][i] == 4)
-				elemsToDraw[k] = Bodies.rectangle(i*100, j*100 - 35, 100, 30, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_hori.png'}}});
-			else if(map[j][i] == 5)
-				elemsToDraw[k] = Bodies.rectangle(i*100 - 35, j*100, 30, 100, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_vert.png'}}});
-			k++;
-		}
-	}
-}
 
 var movingWall = Bodies.rectangle(600, 500, 30, 100, { isStatic: false ,render: { sprite: { texture: './assets/img/wall_vert.png'}}});
 Composite.add(engine.world, movingWall);
-
-var player = Bodies.rectangle(500, 500, 51, 29,  {collisionFilter: {  category: 1 }, isStatic: false , render: { sprite: { texture: './assets/img/patrick.png'}}});
+var player = Bodies.rectangle(500, 500, 51, 29,  {collisionFilter: {  category: 1 }, density: 1, isStatic: false , render: { sprite: { texture: './assets/img/patrick.png'}}});
 Composite.add(engine.world, player);
 
 
@@ -98,25 +75,25 @@ const keyHandlers = {
         Matter.Body.applyForce(player, {
         x: player.position.x,
         y: player.position.y
-        }, {x: 0.0001, y: 0})
+        }, {x: 0.1, y: 0})
     },
     KeyA: () => {
         Matter.Body.applyForce(player, {
         x: player.position.x,
         y: player.position.y
-        }, {x: -0.0001, y: 0})
+        }, {x: -0.1, y: 0})
     },
     KeyS: () => {
         Matter.Body.applyForce(player, {
         x: player.position.x,
         y: player.position.y
-        }, {x: 0, y: 0.0001})
+        }, {x: 0, y: 0.1})
     },
     KeyW: () => {
         Matter.Body.applyForce(player, {
         x: player.position.x,
         y: player.position.y
-        }, {x: 0, y: -0.0001})
+        }, {x: 0, y: -0.1})
     },
     Space: () => {
         bullet.push(Bodies.circle(200, 100, 2, 
@@ -161,6 +138,87 @@ Matter.Events.on(engine, "beforeUpdate", event => {
         y: 600
       })
 });
+
+function mapInit()
+{
+	let k = 0;
+	for(let i = 0; i < map.length; i++) {
+		for(let j = 0; j < map[i].length; j++) {
+			if(map[j][i] == 1)	
+			elemsToDraw[k] =  Bodies.rectangle(i*100, j*100, 100, 100,  {  collisionFilter: { category: 0}, isStatic: true , render: { sprite: { texture: './assets/img/ground.png'}}});
+			else if(map[j][i] == 2)
+				elemsToDraw[k] = Bodies.rectangle(i*100, j*100 + 35, 100, 30, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_hori.png'}}});
+			else if(map[j][i] == 3)
+				elemsToDraw[k] = Bodies.rectangle(i*100 + 35, j*100, 30, 100, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_vert.png'}}});
+			else if(map[j][i] == 4)
+				elemsToDraw[k] = Bodies.rectangle(i*100, j*100 - 35, 100, 30, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_hori.png'}}});
+			else if(map[j][i] == 5)
+				elemsToDraw[k] = Bodies.rectangle(i*100 - 35, j*100, 30, 100, { isStatic: true ,render: { sprite: { texture: './assets/img/wall_vert.png'}}});
+
+            // Bottom Left Doors
+            else if(map[j][i] == 6) {
+                elemsToDraw[k] = Bodies.rectangle(i*100, j*100 - 35, 30, 100, { isStatic: false , frictionAir: 0.001, render: { sprite: { texture: './assets/img/wall_hori.png'}}});
+                var pivot = Constraint.create({
+                    pointA: {x : elemsToDraw[k].position.x - 50, y: elemsToDraw[k].position.y},
+                    bodyB: elemsToDraw[k],
+                    pointB: {x : -50, y: 0},
+                    stiffness: 1,
+                    damping: 0.1
+                });
+                var groom = Constraint.create({
+                    pointA: {x : elemsToDraw[k].position.x -50, y: elemsToDraw[k].position.y - 15},
+                    bodyB: elemsToDraw[k],
+                    pointB: {x : -50, y: -15},
+                    stiffness: 0.005,
+                    damping: 0.1
+                });
+                Composite.add(engine.world, [pivot, groom]);
+            }
+
+            // Botttom Right Doors
+            else if(map[j][i] == 7) {
+                elemsToDraw[k] = Bodies.rectangle(i*100, j*100 - 35, 30, 100, { isStatic: false , frictionAir: 0.001, render: { sprite: { texture: './assets/img/wall_hori.png'}}});
+                var pivot = Constraint.create({
+                    pointA: {x : elemsToDraw[k].position.x +50, y: elemsToDraw[k].position.y},
+                    bodyB: elemsToDraw[k],
+                    pointB: {x : +50, y: 0},
+                    stiffness: 1,
+                    damping: 0.1
+                });
+                var groom = Constraint.create({
+                    pointA: {x : elemsToDraw[k].position.x -90, y: elemsToDraw[k].position.y},
+                    bodyB: elemsToDraw[k],
+                    pointB: {x : -40, y: 0},
+                    stiffness: 0.0003,
+                    damping: 0.1
+                });
+                Composite.add(engine.world, [pivot, groom]);
+            }
+
+            // Ver Doors
+            else if(map[j][i] == 8) {
+                elemsToDraw[k] = Bodies.rectangle(i*100 - 35, j*100, 30, 100, { isStatic: false , frictionAir: 0.001, render: { sprite: { texture: './assets/img/wall_vert.png'}}});
+                var pivot = Constraint.create({
+                    pointA: {x : elemsToDraw[k].position.x, y: elemsToDraw[k].position.y-50},
+                    bodyB: elemsToDraw[k],
+                    pointB: {x : 0, y: -50},
+                    stiffness: 1,
+                    damping: 0.1
+                });
+                var groom = Constraint.create({
+                    pointA: {x : elemsToDraw[k].position.x + 15, y: elemsToDraw[k].position.y -50},
+                    bodyB: elemsToDraw[k],
+                    pointB: {x : 15, y: -50},
+                    stiffness: 0.005,
+                    damping: 0.1,
+                });
+                Composite.add(engine.world, [pivot, groom]);
+            }
+			k++;
+		}
+	}
+    Composite.add(engine.world, elemsToDraw);
+}
 
 /*
 // player

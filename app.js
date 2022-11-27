@@ -65,14 +65,18 @@ var map = [
     [3,4,9,9,9,4,5,0,3,0,0,0,0,0,5],
     [3,0,0,0,0,0,7,0,3,0,0,0,0,0,5],
     [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,4,4,6,4,4,5],
+    [3,0,0,0,0,0,5,0,3,4,4,6,4,9,5],
     [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
     [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
     [3,0,0,0,0,0,7,0,8,0,0,0,0,0,5],
     [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
     [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
         ]
-		   
+
+var glass = [];	
+var shootTimer = true;	
+var ammoLeft = 50;
+
 initFloorMap();
 initMap();
 
@@ -92,9 +96,9 @@ var ammo = Bodies.rectangle(-100,-100, 1, 1, {
 		fillStyle:"#C44D58",
 		text:{
 			content:"300 / 300",
-			color:"white",
-			size:100,
-			family:"Papyrus",
+			color:"black",
+			size:32,
+			family:"consolas",
 		},
 	},
 });
@@ -109,7 +113,7 @@ var runner = Runner.create();
 Runner.run(runner, engine);
 
 // keyboard control
-const keyHandlers = {
+const keyDownHandlers = {
     KeyD: () => {
         Matter.Body.applyForce(player, {
         x: player.position.x,
@@ -166,33 +170,14 @@ const keyHandlers = {
             playerLookAt =  0;
         }
     },
+    KeyR: () => {
+        ammoLeft = 50;
+    },
     Space: () => {
-        bullet.push(Bodies.circle(200, 100, 3, 
-            { label: 'bullet', frictionAir: 0.001, dentisy: 0.1, 
-             render: {
-                fillStyle: 'black',
-                strokeStyle: 'black',
-                lineWidth: 1
-           }}));
-
-        var lastBullet = bullet[bullet.length - 1];
-        var firsBullet = bullet[0];
-
-        console.log(lastBullet.mass)
-        Composite.add(world, lastBullet);
-
-        if (bullet.length > 500) {
-            Composite.remove(world, firsBullet);
-            bullet.shift();
+        if (shootTimer) {
+            shootTimer = false;
+            setTimeout(shoot, 150);
         }
-
-        var angle = getAnglePlayerMouse(player.position.x, player.position.y, mouse.position.x, mouse.position.y);
-
-        Matter.Body.set(lastBullet, "position", {x: player.position.x , y: player.position.y})
-        Matter.Body.applyForce(lastBullet, {
-            x: lastBullet.position.x,
-            y: lastBullet.position.y
-            }, {x: Math.cos(playerLookAt - Math.PI/2) * 0.002, y: Math. sin(playerLookAt - Math.PI/2) * 0.002})
     },
 };
 
@@ -218,24 +203,31 @@ document.addEventListener("keyup", event => {
 
 Matter.Events.on(engine, "beforeUpdate", event => {
     [...keysDown].forEach(k => {
-        keyHandlers[k]?.();
+        keyDownHandlers[k]?.();
     });
     Render.lookAt(render, player, {
         x: windowWidht,
         y: windowHeight
       })
 
-    // var lastBullet = bullet[bullet.length - 1];
-    // if (Matter.Collision.collides(player, lastBullet) != null) {
-    //     console.log("collision");
-    // }
-});
+    if (bullet.length > 1) {
+        for (let i = 0; i < glass.length; i++) {
+            if (Matter.Collision.collides(bullet[bullet.length -1], glass[i]) != null && glass[i].isSleeping) {
+                for (let j = 0; j < glass.length; j++) {
 
-Matter.Events.on(engine, 'glassCollision', function(event) {
-    var pairs = event.pairs;
+                    Matter.Sleeping.set(glass[j], false)
 
-    console.log(pairs)
+                    Matter.Body.applyForce(glass[j], {
+                        x: glass[j].position.x,
+                        y: glass[j].position.y
+                        }, {x: (glass[j].position.x - bullet[bullet.length -1].position.x) *0.00005, 
+                            y: (glass[j].position.y - bullet[bullet.length -1].position.y) *0.00005})
+                }
+            }
+        }
+    }
 
+    updateBulletCounter();
 
 });
 
@@ -394,8 +386,8 @@ function initMap()
 
                 // Window
                 case 9:
-                    elemsToDraw[k] = Composites.stack(i*100 - 50, j*100 - 40, 20, 2, 0, 0, function(x, y) {
-                        return Bodies.rectangle(x, y, 5, 5, {
+                    elemsToDraw[k] = Composites.stack(i*100 - 50, j*100 - 40, 10, 2, 0, 0, function(x, y) {
+                        return Bodies.rectangle(x, y, 10, 10, {
                             isSleeping : true,
                             frictionAir : 0.01,
                             render: {
@@ -405,6 +397,10 @@ function initMap()
                            }
                         });
                     });
+                    for(let l = 0; l < elemsToDraw[k].bodies.length; l++) {
+                        glass.push(elemsToDraw[k].bodies[l]);
+                    }
+
                     k++;
                     break;
 
@@ -423,4 +419,41 @@ function getAnglePlayerMouse(xp,yp,xm,ym) {
     adj = xm - xp;
     tan = opp / adj;
     return angle = Math.atan(tan);
+}
+
+function shoot() {
+    if (ammoLeft > 0) {
+        ammoLeft --;
+        bullet.push(Bodies.circle(200, 100, 5, 
+            { label: 'bullet', frictionAir: 0.01, density: 0.1, 
+             render: {
+                fillStyle: 'black',
+                strokeStyle: 'black',
+                lineWidth: 1
+           }}));
+    
+        var lastBullet = bullet[bullet.length - 1];
+        var firsBullet = bullet[0];
+    
+        console.log(lastBullet.mass)
+        Composite.add(world, lastBullet);
+    
+        if (bullet.length > 500) {
+            Composite.remove(world, firsBullet);
+            bullet.shift();
+        }
+    
+        Matter.Body.set(lastBullet, "position", {x: player.position.x , y: player.position.y})
+        Matter.Body.applyForce(lastBullet, {
+            x: lastBullet.position.x,
+            y: lastBullet.position.y
+            }, {x: Math.cos(playerLookAt - Math.PI/2) * 0.5, y: Math. sin(playerLookAt - Math.PI/2)
+             * 0.5})
+    }
+    shootTimer = true;
+}
+
+function updateBulletCounter() {
+    Matter.Body.set(ammo, "position", {x: player.position.x , y: player.position.y  + 70})
+    ammo.render.text.content = ammoLeft.toString() + "/ 50";
 }

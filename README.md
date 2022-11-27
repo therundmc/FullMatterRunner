@@ -1,7 +1,10 @@
 # FullMatterRunner
 Full Matter Runner in matter js
 
-- W-S-A-D to Move
+- Z (W) to go UP
+- S to go DOWN
+- Q (A) to go LEFT
+- D to go RIGHT
 - SPACE to shoot
 - R to reload
 

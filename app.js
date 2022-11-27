@@ -12,8 +12,8 @@ var Engine = Matter.Engine,
     Body = Matter.Body,
     Bounds = Matter.Bounds;
 
-var windowWidht = 800;
-var windowHeight = 600;
+var windowWidht = 1000;
+var windowHeight = 1000;
     
 
 // create engine

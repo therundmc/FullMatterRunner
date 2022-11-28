@@ -12,8 +12,8 @@ var Engine = Matter.Engine,
     Body = Matter.Body,
     Bounds = Matter.Bounds;
 
-var windowWidht = 1000;
-var windowHeight = 1000;
+var windowWidht = window.innerWidth;
+var windowHeight = window.innerHeight;
     
 
 // create engine
@@ -39,19 +39,19 @@ var render = Render.create({
 
 var floorMap = [
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-    [0,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
+    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         ]
 
@@ -73,12 +73,16 @@ var map = [
     [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
         ]
 
-var glass = [];	
 var shootTimer = true;	
 var ammoLeft = 50;
 
+var floorBodies = [],
+    wallsBodies = [],
+    glassBodies = [];
+
 initFloorMap();
-initMap();
+initWallMap();
+initDynamicMap();
 
 var boxes = Composites.stack(1000, 50, 4, 4, 5, 5, function(x, y) {
     return Bodies.rectangle(x, y, 64, 64, { isStatic: false ,density: 0.8, frictionAir: 0.8, render: { sprite: { texture: './assets/img/box.png'}}});
@@ -209,31 +213,12 @@ Matter.Events.on(engine, "beforeUpdate", event => {
         x: windowWidht,
         y: windowHeight
       })
-
-    if (bullet.length > 1) {
-        for (let i = 0; i < glass.length; i++) {
-            if (Matter.Collision.collides(bullet[bullet.length -1], glass[i]) != null && glass[i].isSleeping) {
-                for (let j = 0; j < glass.length; j++) {
-
-                    Matter.Sleeping.set(glass[j], false)
-
-                    Matter.Body.applyForce(glass[j], {
-                        x: glass[j].position.x,
-                        y: glass[j].position.y
-                        }, {x: (glass[j].position.x - bullet[bullet.length -1].position.x) *0.00005, 
-                            y: (glass[j].position.y - bullet[bullet.length -1].position.y) *0.00005})
-                }
-            }
-        }
-    }
-
+    updateCollisionWithDynamicObjects();
     updateBulletCounter();
-
 });
 
 function initFloorMap()
 {
-    var elemsToDraw = [];
     var k = 0;
 	for(let i = 0; i < floorMap.length; i++) {
 		for(let j = 0; j < floorMap[i].length; j++) {
@@ -241,11 +226,21 @@ function initFloorMap()
 
             switch(type) {
                 case 1:
-                    elemsToDraw[k] = 
+                    floorBodies[k] = 
                     Bodies.rectangle(i*100, j*100, 100, 100,  
                     { collisionFilter: { category: 0}, 
                         isStatic: true, 
                         render: { sprite: { texture: './assets/img/ground.png'}}
+                    });
+                    k++;
+                    break;
+
+                case 2:
+                    floorBodies[k] = 
+                    Bodies.rectangle(i*100, j*100, 100, 100,  
+                    { collisionFilter: { category: 0}, 
+                        isStatic: true, 
+                        render: { sprite: { texture: './assets/img/ground_2.png'}}
                     });
                     k++;
                     break;
@@ -256,12 +251,11 @@ function initFloorMap()
             }
 		}
 	}
-    Composite.add(engine.world, elemsToDraw);
+    Composite.add(engine.world, floorBodies);
 }
 
-function initMap()
+function initWallMap()
 {
-    var elemsToDraw = [];
 	var k = 0;
 	for(let i = 0; i < map.length; i++) {
 		for(let j = 0; j < map[i].length; j++) {
@@ -269,7 +263,7 @@ function initMap()
 
             switch(type) {
                 case 2:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100, j*100 + 35, 100, 30, 
                         { isStatic: true , 
                         render: { sprite: { texture: './assets/img/wall_hori.png'}}
@@ -278,7 +272,7 @@ function initMap()
                     break;
 
                 case 3:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100 + 35, j*100, 30, 100, 
                         { isStatic: true ,
                         render: { sprite: { texture: './assets/img/wall_vert.png'}}
@@ -287,7 +281,7 @@ function initMap()
                     break;
 
                 case 4:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100, j*100 - 35, 100, 30, 
                         { isStatic: true ,
                         render: { sprite: { texture: './assets/img/wall_hori.png'}}
@@ -296,7 +290,7 @@ function initMap()
                     break;
 
                 case 5:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100 - 35, j*100, 30, 100, 
                         { isStatic: true ,
                         render: { sprite: { texture: './assets/img/wall_vert.png'}}
@@ -306,7 +300,7 @@ function initMap()
 
                 // Door Hori
                 case 6:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100, j*100 - 35, 30, 100, 
                         { isStatic: false , 
                         frictionAir: 0.001, 
@@ -314,16 +308,16 @@ function initMap()
                     });
                     var pivot = 
                     Constraint.create({
-                        pointA: {x : elemsToDraw[k].position.x - 50, y: elemsToDraw[k].position.y},
-                        bodyB: elemsToDraw[k],
+                        pointA: {x : wallsBodies[k].position.x - 50, y: wallsBodies[k].position.y},
+                        bodyB: wallsBodies[k],
                         pointB: {x : -50, y: 0},
                         stiffness: 1,
                         damping: 0.1
                     });
                     var groom =
                      Constraint.create({
-                        pointA: {x : elemsToDraw[k].position.x -50, y: elemsToDraw[k].position.y - 15},
-                        bodyB: elemsToDraw[k],
+                        pointA: {x : wallsBodies[k].position.x -50, y: wallsBodies[k].position.y - 15},
+                        bodyB: wallsBodies[k],
                         pointB: {x : -50, y: -15},
                         stiffness: 0.005,
                         damping: 0.1
@@ -334,22 +328,22 @@ function initMap()
 
                 // Door Verti Left
                 case 7:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100 - 35, j*100, 30, 95, 
                         { isStatic: false , 
                         frictionAir: 0.001, 
                         render: { sprite: { texture: './assets/img/door_vert.png'}}
                     });
                     var pivot = Constraint.create({
-                        pointA: {x : elemsToDraw[k].position.x, y: elemsToDraw[k].position.y-50},
-                        bodyB: elemsToDraw[k],
+                        pointA: {x : wallsBodies[k].position.x, y: wallsBodies[k].position.y-50},
+                        bodyB: wallsBodies[k],
                         pointB: {x : 0, y: -50},
                         stiffness: 0.05,
                         damping: 0.1
                     });
                     var groom = Constraint.create({
-                        pointA: {x : elemsToDraw[k].position.x + 15, y: elemsToDraw[k].position.y -50},
-                        bodyB: elemsToDraw[k],
+                        pointA: {x : wallsBodies[k].position.x + 15, y: wallsBodies[k].position.y -50},
+                        bodyB: wallsBodies[k],
                         pointB: {x : +15, y: -50},
                         stiffness: 0.0003,
                         damping: 0.1,
@@ -360,47 +354,27 @@ function initMap()
 
                 // Door Verti Right
                 case 8:
-                    elemsToDraw[k] = 
+                    wallsBodies[k] = 
                     Bodies.rectangle(i*100 + 35, j*100, 30, 95, 
                         { isStatic: false , 
                         frictionAir: 0.001,
                          render: { sprite: { texture: './assets/img/door_vert.png'}}
                     });
                     var pivot = Constraint.create({
-                        pointA: {x : elemsToDraw[k].position.x, y: elemsToDraw[k].position.y-50},
-                        bodyB: elemsToDraw[k],
+                        pointA: {x : wallsBodies[k].position.x, y: wallsBodies[k].position.y-50},
+                        bodyB: wallsBodies[k],
                         pointB: {x : 0, y: -50},
                         stiffness: 0.05,
                         damping: 0.1
                     });
                     var groom = Constraint.create({
-                        pointA: {x : elemsToDraw[k].position.x + 15, y: elemsToDraw[k].position.y -50},
-                        bodyB: elemsToDraw[k],
+                        pointA: {x : wallsBodies[k].position.x + 15, y: wallsBodies[k].position.y -50},
+                        bodyB: wallsBodies[k],
                         pointB: {x : +15, y: -50},
                         stiffness: 0.0003,
                         damping: 0.1,
                     });
                     Composite.add(engine.world, [pivot, groom]);
-                    k++;
-                    break;
-
-                // Window
-                case 9:
-                    elemsToDraw[k] = Composites.stack(i*100 - 50, j*100 - 40, 10, 2, 0, 0, function(x, y) {
-                        return Bodies.rectangle(x, y, 10, 10, {
-                            isSleeping : true,
-                            frictionAir : 0.01,
-                            render: {
-                                fillStyle: 'white',
-                                strokeStyle: 'black',
-                                lineWidth: 2
-                           }
-                        });
-                    });
-                    for(let l = 0; l < elemsToDraw[k].bodies.length; l++) {
-                        glass.push(elemsToDraw[k].bodies[l]);
-                    }
-
                     k++;
                     break;
 
@@ -411,7 +385,39 @@ function initMap()
             }
         }
     }
-    Composite.add(engine.world, elemsToDraw);
+    Composite.add(engine.world, wallsBodies);
+}
+
+function initDynamicMap () {
+    var k = 0;
+	for(let i = 0; i < map.length; i++) {
+		for(let j = 0; j < map[i].length; j++) {
+            var type = map[j][i];
+
+            switch(type) {
+                // Window
+                case 9:
+                    glassBodies[k] = Composites.stack(i*100 - 50, j*100 - 40, 20, 3, 0, 0, function(x, y) {
+                        return Bodies.rectangle(x, y, 5, 5, {
+                            isSleeping : true,
+                            frictionAir : 0.01,
+                            render: {
+                                opacity: 0.8,
+                                fillStyle: 'white',
+                                
+                           }
+                        });
+                    });
+                    k++;
+                    break;
+
+                default:
+                    console.log("Element id: %d unknow", type);
+                    break;
+                }
+        }
+    }
+    Composite.add(engine.world, glassBodies);       
 }
 
 function getAnglePlayerMouse(xp,yp,xm,ym) {
@@ -451,6 +457,30 @@ function shoot() {
              * 0.5})
     }
     shootTimer = true;
+}
+
+function updateCollisionWithDynamicObjects() {
+    if (bullet.length < 1) {
+        return;
+    }
+    var lastBullet = bullet[bullet.length - 1];
+
+    for (let i = 0; i < glassBodies.length; i++) {
+        for (let j = 0; j < glassBodies[i].bodies.length; j++) {
+            var glassBody = glassBodies[i].bodies[j];
+            if (Matter.Collision.collides(lastBullet, glassBody) != null && glassBody.isSleeping) {
+                for (let k = 0; k < glassBodies[i].bodies.length; k++) {
+                    var glassBody = glassBodies[i].bodies[k];
+                    Matter.Sleeping.set(glassBody, false) 
+                    Matter.Body.applyForce(glassBody, {
+                        x: glassBody.position.x,
+                        y: glassBody.position.y
+                        }, {x: (glassBody.position.x - bullet[bullet.length -1].position.x) *0.00005, 
+                            y: (glassBody.position.y - bullet[bullet.length -1].position.y) *0.00005})
+                }
+            }
+        }
+    }
 }
 
 function updateBulletCounter() {

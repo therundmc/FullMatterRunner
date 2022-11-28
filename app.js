@@ -37,40 +37,73 @@ var render = Render.create({
     }
 });
 
-var floorMap = [
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,2,2,2,2,2,1,1,1,2,2,2,2,2,0],
-    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+const floorMap = [
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,00,03,01,01,01,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
+    [00,00,03,01,01,01,01,01,01,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
         ]
 
-var map = [
-    [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,7,0,8,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,4,9,9,9,4,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,7,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,4,4,6,4,9,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [3,0,0,0,0,0,7,0,8,0,0,0,0,0,5],
-    [3,0,0,0,0,0,5,0,3,0,0,0,0,0,5],
-    [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]
+const wallMap = [
+    [02,02,02,02,02,02,02,02,02,02,02,02,02,02,02,00,00,00,00,00],
+    [03,00,00,00,00,00,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,07,00,08,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,05,00,11,00,00,00,00,00,05,00,00,00,00,00],
+    [03,04,09,09,09,04,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,05,00,11,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
+    [03,00,00,00,00,00,10,00,03,04,09,09,09,04,04,04,04,04,05,00],
+    [03,00,00,00,00,00,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,10,00,03,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,05,00,08,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
+    [03,04,04,04,04,04,05,00,11,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,07,00,03,00,00,00,00,00,00,00,00,00,05,00],
+    [03,02,02,02,02,02,05,00,11,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,00,00,03,02,02,02,02,02,02,02,02,02,05,00],
+    [03,00,00,00,00,00,00,00,03,00,00,00,00,00,00,00,00,00,00,00],
+    [04,04,04,04,04,04,04,04,04,00,00,00,00,00,00,00,00,00,00,00]
+        ]
+
+const DynMap = [
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,09,09,09,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,10,00,00,00,09,09,09,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,10,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00]
         ]
 
 var shootTimer = true;	
@@ -78,29 +111,26 @@ var ammoLeft = 50;
 
 var floorBodies = [],
     wallsBodies = [],
-    glassBodies = [];
+    glassBodies = [],
+    boxBody   = [];
 
 initFloorMap();
 initWallMap();
-initDynamicMap();
-
-var boxes = Composites.stack(1000, 50, 4, 4, 5, 5, function(x, y) {
-    return Bodies.rectangle(x, y, 64, 64, { isStatic: false ,density: 0.8, frictionAir: 0.8, render: { sprite: { texture: './assets/img/box.png'}}});
-});
-Composite.add(engine.world, boxes);
+initDynMap();
 
 
-var player = Bodies.rectangle(500, 500, 51, 29,  {collisionFilter: {  category: 1 }, density: 0.05, frictionAir: 0.8,  isStatic: false , render: { sprite: { texture: './assets/img/patrick.png'}}});
+var player = Bodies.rectangle(400, 1750, 51, 29,  {collisionFilter: {  category: 1 }, density: 0.05, frictionAir: 0.8,  isStatic: false , render: { sprite: { texture: './assets/img/patrick.png'}}});
 Composite.add(engine.world, player);
-var playerLookAt = 0;
+Body.setAngle(player, Math.PI/2);
+playerLookAt =  Math.PI/2;
 
 var ammo = Bodies.rectangle(-100,-100, 1, 1, {
     isStatic : true,
 	render:{
 		fillStyle:"#C44D58",
 		text:{
-			content:"300 / 300",
-			color:"black",
+			content:"",
+			color:"white",
 			size:32,
 			family:"consolas",
 		},
@@ -213,7 +243,8 @@ Matter.Events.on(engine, "beforeUpdate", event => {
         x: windowWidht,
         y: windowHeight
       })
-    updateCollisionWithDynamicObjects();
+    handleCollisonWithBulletForce(glassBodies);
+    handleCollisonWithBulletExplosion(boxBody);
     updateBulletCounter();
 });
 
@@ -245,10 +276,20 @@ function initFloorMap()
                     k++;
                     break;
 
-                default:
-                    console.log("Element id: %d unknow", type);
-                    break;
-            }
+            case 3:
+                floorBodies[k] = 
+                Bodies.rectangle(i*100, j*100, 100, 100,  
+                { collisionFilter: { category: 0}, 
+                    isStatic: true, 
+                    render: { sprite: { texture: './assets/img/stairs_up.png'}}
+                });
+                k++;
+                break;
+
+            default:
+                console.log("Element id: %d unknow", type);
+                break;
+        }
 		}
 	}
     Composite.add(engine.world, floorBodies);
@@ -257,9 +298,9 @@ function initFloorMap()
 function initWallMap()
 {
 	var k = 0;
-	for(let i = 0; i < map.length; i++) {
-		for(let j = 0; j < map[i].length; j++) {
-            var type = map[j][i];
+	for(let i = 0; i < wallMap.length; i++) {
+		for(let j = 0; j < wallMap[i].length; j++) {
+            var type = wallMap[j][i];
 
             switch(type) {
                 case 2:
@@ -312,7 +353,10 @@ function initWallMap()
                         bodyB: wallsBodies[k],
                         pointB: {x : -50, y: 0},
                         stiffness: 1,
-                        damping: 0.1
+                        damping: 0.1,
+                        render: {
+                            visible: false
+                        }
                     });
                     var groom =
                      Constraint.create({
@@ -320,7 +364,10 @@ function initWallMap()
                         bodyB: wallsBodies[k],
                         pointB: {x : -50, y: -15},
                         stiffness: 0.005,
-                        damping: 0.1
+                        damping: 0.1,
+                        render: {
+                            visible: false
+                        }
                     });
                     Composite.add(engine.world, [pivot, groom]);
                     k++;
@@ -339,7 +386,10 @@ function initWallMap()
                         bodyB: wallsBodies[k],
                         pointB: {x : 0, y: -50},
                         stiffness: 0.05,
-                        damping: 0.1
+                        damping: 0.1,
+                        render: {
+                            visible: false
+                        }
                     });
                     var groom = Constraint.create({
                         pointA: {x : wallsBodies[k].position.x + 15, y: wallsBodies[k].position.y -50},
@@ -347,6 +397,9 @@ function initWallMap()
                         pointB: {x : +15, y: -50},
                         stiffness: 0.0003,
                         damping: 0.1,
+                        render: {
+                            visible: false
+                        }
                     });
                     Composite.add(engine.world, [pivot, groom]);
                     k++;
@@ -365,7 +418,10 @@ function initWallMap()
                         bodyB: wallsBodies[k],
                         pointB: {x : 0, y: -50},
                         stiffness: 0.05,
-                        damping: 0.1
+                        damping: 0.1,
+                        render: {
+                            visible: false
+                        }
                     });
                     var groom = Constraint.create({
                         pointA: {x : wallsBodies[k].position.x + 15, y: wallsBodies[k].position.y -50},
@@ -373,6 +429,9 @@ function initWallMap()
                         pointB: {x : +15, y: -50},
                         stiffness: 0.0003,
                         damping: 0.1,
+                        render: {
+                            visible: false
+                        }
                     });
                     Composite.add(engine.world, [pivot, groom]);
                     k++;
@@ -388,21 +447,22 @@ function initWallMap()
     Composite.add(engine.world, wallsBodies);
 }
 
-function initDynamicMap () {
+function initDynMap () {
     var k = 0;
-	for(let i = 0; i < map.length; i++) {
-		for(let j = 0; j < map[i].length; j++) {
-            var type = map[j][i];
+    var l = 0;
+	for(let i = 0; i < DynMap.length; i++) {
+		for(let j = 0; j < DynMap[i].length; j++) {
+            var type = DynMap[j][i];
 
             switch(type) {
-                // Window
+                // Hori Window
                 case 9:
                     glassBodies[k] = Composites.stack(i*100 - 50, j*100 - 40, 20, 3, 0, 0, function(x, y) {
                         return Bodies.rectangle(x, y, 5, 5, {
                             isSleeping : true,
                             frictionAir : 0.01,
                             render: {
-                                opacity: 0.8,
+                                opacity: 1,
                                 fillStyle: 'white',
                                 
                            }
@@ -411,12 +471,58 @@ function initDynamicMap () {
                     k++;
                     break;
 
+                // Verti Window Left
+                case 10:
+                    glassBodies[k] = Composites.stack(i*100 - 50, j*100 - 50, 3, 20, 0, 0, function(x, y) {
+                        return Bodies.rectangle(x, y, 5, 5, {
+                            isSleeping : true,
+                            frictionAir : 0.01,
+                            render: {
+                                opacity: 0.8,
+                                fillStyle: 'white',
+                                
+                            }
+                        });
+                    });
+                    k++;
+                    break;
+
+                // Verti Window Right
+                case 11:
+                    glassBodies[k] = Composites.stack(i*100 + 30, j*100 - 50, 3, 20, 0, 0, function(x, y) {
+                        return Bodies.rectangle(x, y, 5, 5, {
+                            isSleeping : true,
+                            frictionAir : 0.01,
+                            render: {
+                                opacity: 1,
+                                fillStyle: 'white',
+                                
+                            }
+                        });
+                    });
+                    k++;
+                    break;
+
+                // Box
+                case 12:
+                    boxBody[l] = Bodies.rectangle(i*100 + 30, j*100 - 50, 64, 64, { 
+                            isStatic: false , 
+                            density: 0.02, 
+                            frictionAir: 0.5, 
+                            render: { 
+                                sprite: { texture: './assets/img/box.png'}
+                                }
+                            });
+                    l++;
+                    break;
+
                 default:
                     console.log("Element id: %d unknow", type);
                     break;
                 }
         }
     }
+    Composite.add(engine.world, boxBody); 
     Composite.add(engine.world, glassBodies);       
 }
 
@@ -459,31 +565,51 @@ function shoot() {
     shootTimer = true;
 }
 
-function updateCollisionWithDynamicObjects() {
-    if (bullet.length < 1) {
+function handleCollisonWithBulletForce(bodies) {
+    if (bullet.length < 1 || bodies.length < 1) {
         return;
     }
     var lastBullet = bullet[bullet.length - 1];
 
-    for (let i = 0; i < glassBodies.length; i++) {
-        for (let j = 0; j < glassBodies[i].bodies.length; j++) {
-            var glassBody = glassBodies[i].bodies[j];
-            if (Matter.Collision.collides(lastBullet, glassBody) != null && glassBody.isSleeping) {
-                for (let k = 0; k < glassBodies[i].bodies.length; k++) {
-                    var glassBody = glassBodies[i].bodies[k];
-                    Matter.Sleeping.set(glassBody, false) 
-                    Matter.Body.applyForce(glassBody, {
-                        x: glassBody.position.x,
-                        y: glassBody.position.y
-                        }, {x: (glassBody.position.x - bullet[bullet.length -1].position.x) *0.00005, 
-                            y: (glassBody.position.y - bullet[bullet.length -1].position.y) *0.00005})
+    for (let i = 0; i < bodies.length; i++) {
+        for (let j = 0; j < bodies[i].bodies.length; j++) {
+            var body = bodies[i].bodies[j];
+            if (Matter.Collision.collides(lastBullet, body) != null && body.isSleeping) {
+                for (let k = 0; k < bodies[i].bodies.length; k++) {
+                    var body = bodies[i].bodies[k];
+                    Matter.Sleeping.set(body, false) 
+                    Matter.Body.applyForce(body, {
+                        x: body.position.x,
+                        y: body.position.y
+                        }, {x: (body.position.x - bullet[bullet.length -1].position.x) * body.mass * 0.001, 
+                            y: (body.position.y - bullet[bullet.length -1].position.y) * body.mass * 0.001})
+                            console.log("collision")
                 }
             }
         }
     }
 }
 
+function handleCollisonWithBulletExplosion(body) {
+    if (bullet.length < 1 || body.length < 1) {
+        return;
+    }
+    var lastBullet = bullet[bullet.length - 1];
+
+    for (let i = 0; i < body.length; i++) {
+        var body = body[i];
+        if (Matter.Collision.collides(lastBullet, body) != null) {
+            Matter.Body.applyForce(body, {
+                x: body.position.x,
+                y: body.position.y
+                }, {x: (body.position.x - bullet[bullet.length -1].position.x) * body.mass * 0.001, 
+                    y: (body.position.y - bullet[bullet.length -1].position.y) * body.mass * 0.001})
+                    console.log("collision")
+        }
+    }
+}
+
 function updateBulletCounter() {
     Matter.Body.set(ammo, "position", {x: player.position.x , y: player.position.y  + 70})
-    ammo.render.text.content = ammoLeft.toString() + "/ 50";
-}
+    ammo.render.text.content = ammoLeft.toString() + " /50";
+} 

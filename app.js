@@ -72,12 +72,12 @@ const wallMap = [
     [03,00,00,00,00,00,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
     [03,00,00,00,00,00,10,00,03,04,09,09,09,04,04,04,04,04,05,00],
     [03,00,00,00,00,00,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
-    [03,00,00,00,00,00,10,00,03,00,00,00,00,00,00,00,00,00,05,00],
-    [03,00,00,00,00,00,05,00,08,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,10,00,00,00,00,00,00,00,00,00,00,00,05,00],
     [03,00,00,00,00,00,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
-    [03,04,04,04,04,04,05,00,11,00,00,00,00,00,00,00,00,00,05,00],
+    [03,00,00,00,00,00,07,00,00,00,00,00,00,00,00,00,00,00,05,00],
+    [03,04,04,04,04,04,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
     [03,00,00,00,00,00,07,00,03,00,00,00,00,00,00,00,00,00,05,00],
-    [03,02,02,02,02,02,05,00,11,00,00,00,00,00,00,00,00,00,05,00],
+    [03,02,02,02,02,02,05,00,08,00,00,00,00,00,00,00,00,00,05,00],
     [03,00,00,00,00,00,00,00,03,02,02,02,02,02,02,02,02,02,05,00],
     [03,00,00,00,00,00,00,00,03,00,00,00,00,00,00,00,00,00,00,00],
     [04,04,04,04,04,04,04,04,04,00,00,00,00,00,00,00,00,00,00,00]
@@ -95,15 +95,15 @@ const DynMap = [
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,10,00,00,00,09,09,09,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,10,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,10,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,12,11,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00]
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,12,12,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,12,12,00,00,00],
+    [00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00]
         ]
 
 var shootTimer = true;	
@@ -213,7 +213,17 @@ const keyDownHandlers = {
             setTimeout(shoot, 150);
         }
     },
+    ShiftLeft: () => {
+        engine.timing.timeScale = 0.2;
+        setTimeout(stopSlowMo, 1000);
+    },
 };
+
+const keyUpHandlers = {
+    ShiftLeft: () => {
+        //engine.timing.timeScale = 1;
+    },
+}
 
 // add mouse control
 var mouse = Mouse.create(render.canvas),
@@ -226,18 +236,24 @@ var mouse = Mouse.create(render.canvas),
             }
         }
     });
-    
+
+const keysUp = new Set();
 const keysDown = new Set();
 document.addEventListener("keydown", event => {
     keysDown.add(event.code);
+    keysUp.delete(event.code);
 });
 document.addEventListener("keyup", event => {
+    keysUp.add(event.code);
     keysDown.delete(event.code);
 });
 
 Matter.Events.on(engine, "beforeUpdate", event => {
     [...keysDown].forEach(k => {
         keyDownHandlers[k]?.();
+    });
+    [...keysUp].forEach(k => {
+        keyUpHandlers[k]?.();
     });
     Render.lookAt(render, player, {
         x: windowWidht,
@@ -559,10 +575,14 @@ function shoot() {
         Matter.Body.applyForce(lastBullet, {
             x: lastBullet.position.x,
             y: lastBullet.position.y
-            }, {x: Math.cos(playerLookAt - Math.PI/2) * 0.5, y: Math. sin(playerLookAt - Math.PI/2)
-             * 0.5})
+            }, {x: Math.cos(playerLookAt - Math.PI/2) * fts(0.5), y: Math. sin(playerLookAt - Math.PI/2)
+             * fts(0.5)})
     }
     shootTimer = true;
+};
+
+function stopSlowMo() {
+    engine.timing.timeScale = 1;
 }
 
 function handleCollisonWithBulletForce(bodies) {
@@ -583,12 +603,11 @@ function handleCollisonWithBulletForce(bodies) {
                         y: body.position.y
                         }, {x: (body.position.x - bullet[bullet.length -1].position.x) * body.mass * 0.001, 
                             y: (body.position.y - bullet[bullet.length -1].position.y) * body.mass * 0.001})
-                            console.log("collision")
                 }
             }
         }
     }
-}
+};
 
 function handleCollisonWithBulletExplosion(body) {
     if (bullet.length < 1 || body.length < 1) {
@@ -597,19 +616,43 @@ function handleCollisonWithBulletExplosion(body) {
     var lastBullet = bullet[bullet.length - 1];
 
     for (let i = 0; i < body.length; i++) {
-        var body = body[i];
-        if (Matter.Collision.collides(lastBullet, body) != null) {
-            Matter.Body.applyForce(body, {
-                x: body.position.x,
-                y: body.position.y
-                }, {x: (body.position.x - bullet[bullet.length -1].position.x) * body.mass * 0.001, 
-                    y: (body.position.y - bullet[bullet.length -1].position.y) * body.mass * 0.001})
-                    console.log("collision")
+        var localBody = body[i];
+        if (Matter.Collision.collides(lastBullet, localBody) != null) {
+            Matter.World.remove(world, localBody);
+            var particles = Composites.stack(localBody.position.x, localBody.position.y, 3, 3, 0, 0, function(x, y) {
+                return Bodies.rectangle(x, y, 16, 16, {
+                    frictionAir : 0.05,
+                    render: {
+                        opacity: 1,
+                        fillStyle: '#69594c',   
+                        sprite: { 
+                            texture: './assets/img/box_piece_1.png',
+                            xScale: Common.random(1,2),
+                            yScale: Common.random(1,2)},
+
+                    }
+                });
+            });
+            for (let k = 0; k < particles.bodies.length; k++) {
+                var particle = particles.bodies[k];
+                var forceMagnitude = 0.1 * particle.mass;
+                Matter.Body.applyForce(particle, {
+                    x: particle.position.x,
+                    y: particle.position.y,
+                    }, {x: Common.random(-1, 1) * forceMagnitude, 
+                        y: Common.random(-1, 1) * forceMagnitude });
+            }
+            Composite.add(world, particles);
+            body.splice(i,1);
         }
     }
-}
+};
 
 function updateBulletCounter() {
     Matter.Body.set(ammo, "position", {x: player.position.x , y: player.position.y  + 70})
     ammo.render.text.content = ammoLeft.toString() + " /50";
 } 
+
+function fts(force) {
+    return force * (1 / engine.timing.timeScale);
+}

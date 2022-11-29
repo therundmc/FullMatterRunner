@@ -90,20 +90,20 @@ const DynMap = [
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,09,09,09,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,14,09,09,09,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,16,15,17,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,16,15,17,00,10,00,00,00,09,09,09,00,14,14,19,00,00,00],
+    [00,00,16,15,17,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,10,00,11,00,16,15,17,00,16,15,17,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,10,00,00,00,09,09,09,00,00,00,00,00,00,00],
+    [00,19,00,00,00,00,00,00,11,00,09,09,00,00,00,09,09,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,10,00,11,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,12,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,16,15,17,00,16,15,17,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,16,15,17,00,16,15,17,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,12,12,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,12,12,00,00,00],
-    [00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,12,00,00,00,00,00,00,00,00,00,00,00,00,00,00]
+    [00,00,00,00,00,13,13,13,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00]
         ]
 
 var shootTimer = true;	
@@ -119,7 +119,14 @@ initWallMap();
 initDynMap();
 
 
-var player = Bodies.rectangle(400, 1750, 51, 29,  {collisionFilter: {  category: 1 }, density: 0.05, frictionAir: 0.8,  isStatic: false , render: { sprite: { texture: './assets/img/patrick.png'}}});
+var player = Bodies.rectangle(400, 1750, 51, 29,  {
+    collisionFilter: {  category: 1 }, 
+    density: 0.05, 
+    frictionAir: 0.8, 
+    isStatic: false , render: { 
+        sprite: { texture: './assets/img/patrick.png'}
+        }
+    });
 Composite.add(engine.world, player);
 Body.setAngle(player, Math.PI/2);
 playerLookAt =  Math.PI/2;
@@ -486,7 +493,6 @@ function initDynMap () {
                     });
                     k++;
                     break;
-
                 // Verti Window Left
                 case 10:
                     glassBodies[k] = Composites.stack(i*100 - 50, j*100 - 50, 3, 20, 0, 0, function(x, y) {
@@ -494,7 +500,7 @@ function initDynMap () {
                             isSleeping : true,
                             frictionAir : 0.01,
                             render: {
-                                opacity: 0.8,
+                                opacity: 1,
                                 fillStyle: 'white',
                                 
                             }
@@ -502,7 +508,6 @@ function initDynMap () {
                     });
                     k++;
                     break;
-
                 // Verti Window Right
                 case 11:
                     glassBodies[k] = Composites.stack(i*100 + 30, j*100 - 50, 3, 20, 0, 0, function(x, y) {
@@ -518,10 +523,9 @@ function initDynMap () {
                     });
                     k++;
                     break;
-
                 // Box
                 case 12:
-                    boxBody[l] = Bodies.rectangle(i*100 + 30, j*100 - 50, 64, 64, { 
+                    boxBody[l] = Bodies.rectangle(i*100, j*100, 64, 64, { 
                             isStatic: false , 
                             density: 0.02, 
                             frictionAir: 0.5, 
@@ -529,6 +533,100 @@ function initDynMap () {
                                 sprite: { texture: './assets/img/box.png'}
                                 }
                             });
+                    l++;
+                    break;
+                // Chair Up
+                case 13:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100 + 10, 70, 50, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/armchair/armchair.png'}
+                                }
+                            });
+                    l++;
+                    break;
+                // Chair Down
+                case 14:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100 + 10, 70, 50, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/armchair/armchair.png'}
+                                }
+                            });
+                    Body.rotate(boxBody[l], Math.PI);
+                    l++;
+                    break;
+                // Table
+                case 15:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100, 98, 65, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                strokeStyle: '#b97a56',
+                                sprite: { texture: './assets/img/table/table.png'}
+                                }
+                            });
+                    Body.rotate(boxBody[l], Math.PI/2);
+                    l++;
+                    break;
+                // Chair Right
+                case 16:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100, 98, 65, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                strokeStyle: '#b97a56',
+                                sprite: { texture: './assets/img/chair/chair.png'}
+                                }
+                            });
+                    Body.rotate(boxBody[l], Math.PI / 2);
+                    l++;
+                    break;
+                // Chair Left
+                case 17:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100, 98, 65, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                strokeStyle: '#b97a56',
+                                sprite: { texture: './assets/img/chair/chair.png'}
+                                }
+                            });
+                    Body.rotate(boxBody[l], -Math.PI / 2);
+                    l++;
+                    break;
+                // Cupboard
+                case 18:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100, 100, 20, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                strokeStyle: '#b97a56',
+                                sprite: { texture: './assets/img/cupboard.png'}
+                                }
+                            });
+                    Body.rotate(boxBody[l], -Math.PI / 2);
+                    l++;
+                    break;
+                // Plant
+                case 19:
+                    boxBody[l] = Bodies.rectangle(i*100, j*100 + 10, 65, 65, { 
+                            isStatic: true , 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/plant/plant.png'}
+                                }
+                            });
+                    Body.rotate(boxBody[l], -Math.PI / 2);
                     l++;
                     break;
 
@@ -552,8 +650,11 @@ function getAnglePlayerMouse(xp,yp,xm,ym) {
 function shoot() {
     if (ammoLeft > 0) {
         ammoLeft --;
-        bullet.push(Bodies.circle(200, 100, 5, 
-            { label: 'bullet', frictionAir: 0.01, density: 0.1, 
+        bullet.push(Bodies.circle(200, 100, 5, { 
+            label: 'bullet', 
+            frictionAir: 0.01, 
+            density: 0.1,
+            restitution: 0.8, 
              render: {
                 fillStyle: 'black',
                 strokeStyle: 'black',
@@ -562,11 +663,10 @@ function shoot() {
     
         var lastBullet = bullet[bullet.length - 1];
         var firsBullet = bullet[0];
-    
-        console.log(lastBullet.mass)
+
         Composite.add(world, lastBullet);
     
-        if (bullet.length > 500) {
+        if (bullet.length > 50) {
             Composite.remove(world, firsBullet);
             bullet.shift();
         }
@@ -619,28 +719,33 @@ function handleCollisonWithBulletExplosion(body) {
         var localBody = body[i];
         if (Matter.Collision.collides(lastBullet, localBody) != null) {
             Matter.World.remove(world, localBody);
-            var particles = Composites.stack(localBody.position.x, localBody.position.y, 3, 3, 0, 0, function(x, y) {
-                return Bodies.rectangle(x, y, 16, 16, {
-                    frictionAir : 0.05,
+            var particles = Composites.stack(localBody.position.x, localBody.position.y, 2, 2, 0, 0, function(x, y) {
+                var pieceNumber = Math.round(Common.random(1,4));
+                var imgPath = localBody.render.sprite.texture;
+                var imgPiecePath =  imgPath.slice(0, imgPath.length - 4)  + "_piece" + pieceNumber + imgPath.slice(imgPath.length - 4);
+                return Bodies.rectangle(x, y, 20, 30, {
+                    frictionAir : 0.01,
                     render: {
                         opacity: 1,
-                        fillStyle: '#69594c',   
+                        // fillStyle: localBody.render.strokeStyle,   
+                        // strokeStyle: 'black',  
+                        // lineWidth: 2
                         sprite: { 
-                            texture: './assets/img/box_piece_1.png',
-                            xScale: Common.random(1,2),
-                            yScale: Common.random(1,2)},
+                            texture: imgPiecePath,
+                            xScale: Common.random(0.8,1.5),
+                            yScale: Common.random(0.8,1.5)},
 
                     }
                 });
             });
             for (let k = 0; k < particles.bodies.length; k++) {
                 var particle = particles.bodies[k];
-                var forceMagnitude = 0.1 * particle.mass;
+                var forceMagnitude = 0.04 * particle.mass;
                 Matter.Body.applyForce(particle, {
                     x: particle.position.x,
                     y: particle.position.y,
-                    }, {x: Common.random(-1, 1) * forceMagnitude, 
-                        y: Common.random(-1, 1) * forceMagnitude });
+                    }, {x: Common.random(-1, 1) * fts(forceMagnitude), 
+                        y: Common.random(-1, 1) * fts(forceMagnitude) });
             }
             Composite.add(world, particles);
             body.splice(i,1);

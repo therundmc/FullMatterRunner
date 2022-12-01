@@ -159,10 +159,10 @@ const keyDownHandlers = {
         this.player.reload();
     },
     KeyE: () => {
-        player.pickGun();
+        player.pickGun('gun');
     },
     Space: () => {
-        player.pickGun();
+        player.pickGun('shotgun');
         player.shoot();
     },
     ShiftLeft: () => {
@@ -214,6 +214,8 @@ Matter.Events.on(engine, "beforeUpdate", event => {
     handleCollisonWithBulletForce(DynMap.bodies[0], player.getLastBullet());
     handleCollisonWithBulletDestruction(DynMap.bodies[1], player.getLastBullet());
     updateBulletCounter();
+
+    console.log(engine.world.bodies.length + "//" + engine.world.composites.length);
 });
 
 function getAnglePlayerMouse(xp,yp,xm,ym) {
@@ -227,53 +229,59 @@ function shoot() {
 
 };
 
+function startSlowMo() {
+    engine.timing.timeScale = 0.2;
+}
 function stopSlowMo() {
     engine.timing.timeScale = 1;
 }
 
 function handleCollisonWithBulletForce(bodies, bullet) {
-    if (bodies.length < 1 || bullet == 0) {
+    if (bodies.length < 1 || bullet.length < 1) {
         return;
     }
-
+    for (let l = 0; l < bullet.length; l++) {
     for (let i = 0; i < bodies.length; i++) {
         for (let j = 0; j < bodies[i].bodies.length; j++) {
             var body = bodies[i].bodies[j];
-            if (Matter.Collision.collides(bullet, body) != null && body.isSleeping) {
+            if (Matter.Collision.collides(bullet[l], body) != null && body.isSleeping) {
                 for (let k = 0; k < bodies[i].bodies.length; k++) {
                     var body = bodies[i].bodies[k];
                     Matter.Sleeping.set(body, false) 
                     Matter.Body.applyForce(body, {
                         x: body.position.x,
                         y: body.position.y
-                        }, {x: (body.position.x - bullet.position.x) * body.mass * 0.001, 
-                            y: (body.position.y - bullet.position.y) * body.mass * 0.001})
+                        }, {x: (body.position.x - bullet[l].position.x) * body.mass * 0.001, 
+                            y: (body.position.y - bullet[l].position.y) * body.mass * 0.001})
                 }
+
+                setTimeout(startSlowMo, 100);
+                setTimeout(stopSlowMo, 600);
+                Composite.remove(engine.world, bullet[l]);
             }
         }
+    }
     }
 };
 
 function handleCollisonWithBulletDestruction(body, bullet) {
-    if (body.length < 1 || bullet == 0) {
+    if (body.length < 1 || bullet.length < 1) {
         return;
     }
 
+    for (let l = 0; l < bullet.length; l++) {
     for (let i = 0; i < body.length; i++) {
         var localBody = body[i];
-        if (Matter.Collision.collides(bullet, localBody) != null) {
+        if (Matter.Collision.collides(bullet[l], localBody) != null) {
             Matter.World.remove(world, localBody);
+            var pieceNumber = Math.round(Common.random(1,4));
+            var imgPath = localBody.render.sprite.texture;
+            var imgPiecePath =  imgPath.slice(0, imgPath.length - 4)  + "_piece" + pieceNumber + imgPath.slice(imgPath.length - 4);
             var particles = Composites.stack(localBody.position.x, localBody.position.y, 2, 2, 0, 0, function(x, y) {
-                var pieceNumber = Math.round(Common.random(1,4));
-                var imgPath = localBody.render.sprite.texture;
-                var imgPiecePath =  imgPath.slice(0, imgPath.length - 4)  + "_piece" + pieceNumber + imgPath.slice(imgPath.length - 4);
                 return Bodies.rectangle(x, y, 20, 30, {
                     frictionAir : 0.01,
                     render: {
                         opacity: 1,
-                        // fillStyle: localBody.render.strokeStyle,   
-                        // strokeStyle: 'black',  
-                        // lineWidth: 2
                         sprite: { 
                             texture: imgPiecePath,
                             xScale: Common.random(0.8,1.5),
@@ -282,18 +290,35 @@ function handleCollisonWithBulletDestruction(body, bullet) {
                     }
                 });
             });
-            for (let k = 0; k < particles.bodies.length; k++) {
-                var particle = particles.bodies[k];
-                var forceMagnitude = 0.04 * particle.mass;
+            var particles2 = Composites.stack(localBody.position.x, localBody.position.y, 4, 4, 0, 0, function(x, y) {
+                return Bodies.rectangle(x, y, Common.random(5,10), Common.random(5,10), {
+                    frictionAir : 0.01,
+                    render: {
+                        opacity: 1,
+                        sprite: { 
+                            texture: imgPiecePath,
+                            xScale: Common.random(0.05,0.5),
+                            yScale: Common.random(0.05,0.5)},
+
+                    }
+                });
+            });
+
+            for (let k = 0; k < particles2.bodies.length; k++) {
+                var particle = particles2.bodies[k];
+                var forceMagnitude = 0.0005 * particle.mass;
                 Matter.Body.applyForce(particle, {
                     x: particle.position.x,
                     y: particle.position.y,
-                    }, {x: Common.random(-1, 1) * fts(forceMagnitude), 
-                        y: Common.random(-1, 1) * fts(forceMagnitude) });
+                    }, {x: (particle.position.x - bullet[l].position.x) * fts(forceMagnitude), 
+                        y: (particle.position.y - bullet[l].position.y) * fts(forceMagnitude) });
             }
+            Composite.remove(engine.world, bullet[l]);
             Composite.add(world, particles);
+            Composite.add(world, particles2);
             body.splice(i,1);
         }
+    }   
     }
 };
 

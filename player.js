@@ -58,7 +58,13 @@ class Player {
 
         var ox = (Math.cos(this.lookAt - Math.PI/2) * 30);
         var oy = (Math.sin(this.lookAt - Math.PI/2) * 30);
-        this.gun = new Gun(this.body.position.x + ox, this.body.position.y + oy, 8, 32, 'gun', this.lookAt, this.world);
+        if (Math.abs(ox) > Math.abs(oy)) {
+            oy += 15;
+        }
+        else {
+            ox += 15;
+        }
+        this.gun = new Gun(this.body.position.x + ox, this.body.position.y + oy, 8, 32, gunType, this.lookAt, this.world);
         this.hand = Constraint.create({
             bodyA: this.body,
             pointA: {x : ox, y: oy},
@@ -90,10 +96,10 @@ class Player {
     }
 
     getLastBullet() {
-        if (this.gun != 0 && this.gun.getLastBullet() != 0) {
-            return this.gun.getLastBullet();
+        if (this.gun != 0 && this.gun.getNbBullet() > 0) {
+            return this.gun.bullet;
         }
-        return 0;
+        return new Array(0);
     }
 
     getAmmoLeft() {

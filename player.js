@@ -1,22 +1,26 @@
 class Player {
-    constructor(x, y, w, h, asset, world) {
+    constructor(x, y, w, h, asset, category, mask, world) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.asset = asset;
         this.world = world;
+        this.category = category;
+        this.mask = mask;
         this.body;
         this.lookAt = 0;
         this.gun = 0;
         this.hand;
+
+        this.prevDir = 0;
 
         this.draw();
     };
 
     draw() {
         this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
-            collisionFilter: {  category: 1 }, 
+            collisionFilter: {  category: this.category, mask: this.mask}, 
             density: 0.05, 
             frictionAir: 0.8, 
             isStatic: false , 
@@ -34,7 +38,70 @@ class Player {
             }, {x: x, y: y})
     };
 
-    rotate(angle, stepAngle) {
+    moveRandom() {
+        var collisionArray = getCollisionArray(CATEGORY_WALLMAP, this.category);
+        var dir = this.prevDir;
+        if (collisionArray.length > 0){
+            if (this.prevDir < 3)  {
+                this.prevDir ++;
+            }
+            else {
+                this.prevDir = 0;
+            }
+        }
+
+        console.log(this.prevDir);
+
+        var f  = 0.5;
+        if (this.prevDir == 0) {
+            this.moveRight(f);
+        }
+        else if (this.prevDir == 1){
+            this.moveLeft(f);
+        }
+        else if (this.prevDir == 2){
+            this.moveUp(f);
+        }
+        else if (this.prevDir == 3){
+            this.moveDown(f);
+        }
+
+    };
+
+    moveRight(f = 1) {
+        Matter.Body.applyForce(this.body, {
+            x: this.body.position.x,
+            y: this.body.position.y
+            }, {x: f, y: 0})
+            this.rotate(Math.PI/2);
+    }
+
+    moveLeft(f = 1) {
+        Matter.Body.applyForce(this.body, {
+            x: this.body.position.x,
+            y: this.body.position.y
+            }, {x: -f, y: 0})
+            this.rotate(3*Math.PI/2);
+    }
+
+    moveUp(f = 1) {
+        Matter.Body.applyForce(this.body, {
+            x: this.body.position.x,
+            y: this.body.position.y
+            }, {x: 0, y: -f})
+            this.rotate(0);
+    }
+
+    moveDown(f = 1) {
+        Matter.Body.applyForce(this.body, {
+            x: this.body.position.x,
+            y: this.body.position.y
+            }, {x: 0, y: f})
+            this.rotate(Math.PI);
+    }
+
+
+    rotate(angle, stepAngle = Math.PI/15) {
         if (this.lookAt < angle) {
             this.lookAt += stepAngle;
         }

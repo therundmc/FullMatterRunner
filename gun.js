@@ -59,7 +59,7 @@ class Gun {
                 Body.setAngle(this.body, this.lookAt);
                 this.ammoCapacity = 5;
                 this.ammoLeft = this.ammoCapacity;
-                this.nbBulletPerShot = 10;
+                this.nbBulletPerShot = 5;
                 this.FireRate = 1000;
                 break;
 
@@ -83,8 +83,8 @@ class Gun {
         this.bullet = [];
         for (let i = 0; i < this.nbBulletPerShot; i++) {
         // bulletdd
-            this.bullet.push(Bodies.rectangle(this.body.position.x + i, this.body.position.y + i, 5, 10, {
-                collisionFilter: {  category: 1 }, 
+            this.bullet.push(Bodies.rectangle(this.body.position.x + 20*i, this.body.position.y + i, 5, 10, {
+                collisionFilter: {  category: CATEGORY_BULLET, mask: MASK_BULLET }, 
                 density: 0.05, 
                 frictionAir: 0.001, 
                 isStatic: false , 

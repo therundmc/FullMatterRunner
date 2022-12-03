@@ -10,7 +10,28 @@ var Engine = Matter.Engine,
     Common = Matter.Common,
     Bodies = Matter.Bodies,
     Body = Matter.Body,
-    Bounds = Matter.Bounds;
+    Bounds = Matter.Bounds,
+    Detector = Matter.Detector;
+
+
+// Define collisions mask
+const   CATEGORY_PLAYER     = 0b0000001,
+        CATEGORY_ENEMY      = 0b0000010,
+        CATEGORY_FLOORMAP   = 0b0000100,
+        CATEGORY_WALLMAP    = 0b0001000,
+        CATEGORY_DYNMAP     = 0b0010000,
+        CATEGORY_BULLET     = 0b0100000,
+        CATEGORY_PARTICLES  = 0b1000000;
+
+const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_BULLET,    
+        MASK_ENEMY      = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLES + CATEGORY_PLAYER + CATEGORY_BULLET,    
+        MASK_FLOORMAP   = 0,
+        MASK_WALLMAP    = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_BULLET + CATEGORY_PARTICLES + CATEGORY_ENEMY,
+        MASK_DYNMAP     = CATEGORY_PLAYER + CATEGORY_WALLMAP + CATEGORY_BULLET + CATEGORY_PARTICLES,
+        MASK_BULLET     = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_ENEMY + CATEGORY_PARTICLES,
+        MASK_PARTICLES  = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_ENEMY;
+        
+
 
 // get windows size
 var windowWidht = window.innerWidth;
@@ -40,24 +61,24 @@ var render = Render.create({
 
 const floorMapArray = [
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,00,00,00,00,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,02,02,02,02,02,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,00,03,01,01,01,01,01,01,02,02,02,02,02,02,02,02,02,00,00],
-    [00,00,03,01,01,01,01,01,01,00,00,00,00,00,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,04,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,00,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,04,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,00,10,01,01,01,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
+    [00,00,10,01,01,01,01,01,01,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
         ]
 
@@ -71,7 +92,7 @@ const wallMapArray = [
     [03,04,00,00,00,04,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
     [03,00,00,00,00,00,05,00,00,00,00,00,00,00,05,00,00,00,00,00],
     [03,00,00,00,00,00,05,00,03,00,00,00,00,00,05,00,00,00,00,00],
-    [03,00,00,00,00,00,00,00,03,04,00,00,00,04,04,04,04,04,05,00],
+    [03,00,00,00,00,00,00,00,03,04,00,06,00,04,04,04,04,04,05,00],
     [03,00,00,00,00,00,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
     [03,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,05,00],
     [03,00,00,00,00,00,05,00,03,00,00,00,00,00,00,00,00,00,05,00],
@@ -86,19 +107,19 @@ const wallMapArray = [
 
 const DynMapArray = [
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,21,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,20,00,24,00,23,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,13,00,22,00,19,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,09,09,09,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
-    [00,14,09,09,09,14,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,00,00,00,00,00,00,11,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,16,15,17,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,00,16,15,17,00,10,00,00,00,09,09,09,00,14,14,19,00,00,00],
+    [00,00,16,15,17,00,00,00,00,19,00,00,00,13,00,00,00,00,00,00],
+    [00,00,16,15,17,00,10,00,00,00,09,00,09,00,14,14,00,00,00,00],
     [00,00,16,15,17,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,10,00,11,00,16,15,17,00,16,15,17,00,00,00],
-    [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
-    [00,19,00,00,00,00,00,00,11,00,09,09,00,00,00,09,09,00,00,00],
+    [00,20,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
+    [00,00,00,00,00,00,00,00,11,00,09,09,00,00,00,09,09,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,16,15,17,00,16,15,17,00,00,00],
     [00,00,00,00,00,00,00,00,00,00,16,15,17,00,16,15,17,00,00,00],
@@ -114,7 +135,9 @@ var floorMap = new Map(0, 0, floorMapArray, 0, engine.world);
 var wallMap = new Map(0, 0, wallMapArray, 1, engine.world);
 var DynMap = new Map(0, 0, DynMapArray, 2, engine.world);
 
-var player = new Player(400, 1750, 51, 29, './assets/img/patrick.png', engine.world);
+var player = new Player(400, 1750, 51, 29, './assets/img/patrick.png', CATEGORY_PLAYER, MASK_PLAYER, engine.world);
+
+var thug = new Player(300, 1000, 51, 29, './assets/img/thug_1.png', CATEGORY_ENEMY, MASK_ENEMY, engine.world);
 
 var ammo = Bodies.rectangle(-100,-100, 1, 1, {
     isStatic : true,
@@ -131,35 +154,34 @@ var ammo = Bodies.rectangle(-100,-100, 1, 1, {
 });
 Composite.add(engine.world, ammo);
 
+
 Render.run(render);
 
 // create runner
 var runner = Runner.create();
+runner.delta = 1000 / 10;
 Runner.run(runner, engine);
 
 // keyboard control
 const keyDownHandlers = {
     KeyD: () => {
-        player.move(1, 0);
-        player.rotate(Math.PI/2, Math.PI/15);
+        player.moveRight();
     },
     KeyA: () => {
-        player.move(-1, 0);
-        player.rotate(3*Math.PI/2, Math.PI/15);
+        player.moveLeft();
     },
     KeyS: () => {
-        player.move(0, 1);
-        player.rotate(Math.PI, Math.PI/15);
+        player.moveDown();
     },
     KeyW: () => {
-        player.move(0, -1);
-        player.rotate(0, Math.PI/15);
+        player.moveUp();
     },
     KeyR: () => {
         this.player.reload();
     },
     KeyE: () => {
         player.pickGun('gun');
+        setInterval(moveThug(), 1000);
     },
     Space: () => {
         player.pickGun('shotgun');
@@ -211,11 +233,13 @@ Matter.Events.on(engine, "beforeUpdate", event => {
         x: windowWidht,
         y: windowHeight
       })
-    handleCollisonWithBulletForce(DynMap.bodies[0], player.getLastBullet());
+
     handleCollisonWithBulletDestruction(DynMap.bodies[1], player.getLastBullet());
     updateBulletCounter();
 
-    console.log(engine.world.bodies.length + "//" + engine.world.composites.length);
+    moveThug();
+
+    //console.log(engine.world.bodies.length + "//" + engine.world.composites.length);
 });
 
 function getAnglePlayerMouse(xp,yp,xm,ym) {
@@ -236,89 +260,28 @@ function stopSlowMo() {
     engine.timing.timeScale = 1;
 }
 
-function handleCollisonWithBulletForce(bodies, bullet) {
-    if (bodies.length < 1 || bullet.length < 1) {
-        return;
-    }
-    for (let l = 0; l < bullet.length; l++) {
-    for (let i = 0; i < bodies.length; i++) {
-        for (let j = 0; j < bodies[i].bodies.length; j++) {
-            var body = bodies[i].bodies[j];
-            if (Matter.Collision.collides(bullet[l], body) != null && body.isSleeping) {
-                for (let k = 0; k < bodies[i].bodies.length; k++) {
-                    var body = bodies[i].bodies[k];
-                    Matter.Sleeping.set(body, false) 
-                    Matter.Body.applyForce(body, {
-                        x: body.position.x,
-                        y: body.position.y
-                        }, {x: (body.position.x - bullet[l].position.x) * body.mass * 0.001, 
-                            y: (body.position.y - bullet[l].position.y) * body.mass * 0.001})
-                }
 
-                setTimeout(startSlowMo, 100);
-                setTimeout(stopSlowMo, 600);
-                Composite.remove(engine.world, bullet[l]);
-            }
-        }
-    }
-    }
-};
 
-function handleCollisonWithBulletDestruction(body, bullet) {
-    if (body.length < 1 || bullet.length < 1) {
-        return;
-    }
+function handleCollisonWithBulletDestruction() {
 
-    for (let l = 0; l < bullet.length; l++) {
-    for (let i = 0; i < body.length; i++) {
-        var localBody = body[i];
-        if (Matter.Collision.collides(bullet[l], localBody) != null) {
-            Matter.World.remove(world, localBody);
-            var pieceNumber = Math.round(Common.random(1,4));
-            var imgPath = localBody.render.sprite.texture;
-            var imgPiecePath =  imgPath.slice(0, imgPath.length - 4)  + "_piece" + pieceNumber + imgPath.slice(imgPath.length - 4);
-            var particles = Composites.stack(localBody.position.x, localBody.position.y, 2, 2, 0, 0, function(x, y) {
-                return Bodies.rectangle(x, y, 20, 30, {
-                    frictionAir : 0.01,
-                    render: {
-                        opacity: 1,
-                        sprite: { 
-                            texture: imgPiecePath,
-                            xScale: Common.random(0.8,1.5),
-                            yScale: Common.random(0.8,1.5)},
+    var collisionArray = getCollisionArray(CATEGORY_DYNMAP, CATEGORY_BULLET);
 
-                    }
-                });
-            });
-            var particles2 = Composites.stack(localBody.position.x, localBody.position.y, 4, 4, 0, 0, function(x, y) {
-                return Bodies.rectangle(x, y, Common.random(5,10), Common.random(5,10), {
-                    frictionAir : 0.01,
-                    render: {
-                        opacity: 1,
-                        sprite: { 
-                            texture: imgPiecePath,
-                            xScale: Common.random(0.05,0.5),
-                            yScale: Common.random(0.05,0.5)},
+    for(i = 0; i < collisionArray.length; i++) {
 
-                    }
-                });
-            });
+        var body = collisionArray[i].bodyA;
+        var bullet = collisionArray[i].bodyB;
 
-            for (let k = 0; k < particles2.bodies.length; k++) {
-                var particle = particles2.bodies[k];
-                var forceMagnitude = 0.0005 * particle.mass;
-                Matter.Body.applyForce(particle, {
-                    x: particle.position.x,
-                    y: particle.position.y,
-                    }, {x: (particle.position.x - bullet[l].position.x) * fts(forceMagnitude), 
-                        y: (particle.position.y - bullet[l].position.y) * fts(forceMagnitude) });
-            }
-            Composite.remove(engine.world, bullet[l]);
-            Composite.add(world, particles);
-            Composite.add(world, particles2);
-            body.splice(i,1);
-        }
-    }   
+        particles = generateParticles(body, 5, 5, 4, 4);
+        applyForceToParticles(particles, bullet);
+
+        Composite.remove(world, body);
+        Composite.remove(world, bullet);
+
+        var triggerSlowMo = Common.random(0,10)
+        if (triggerSlowMo < 1) {
+            setTimeout(startSlowMo, 100);
+            setTimeout(stopSlowMo, 600);
+        } 
     }
 };
 
@@ -331,4 +294,8 @@ function updateBulletCounter() {
 
 function fts(force) {
     return force * (1 / engine.timing.timeScale);
+}
+
+function moveThug() {
+    thug.moveRandom();
 }

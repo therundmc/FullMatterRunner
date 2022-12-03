@@ -40,7 +40,7 @@ class Map {
                 case 1:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100, j*100, 100, 100,  
-                    { collisionFilter: { category: 0}, 
+                    { collisionFilter: {category: CATEGORY_FLOORMAP, mask: MASK_FLOORMAP}, 
                         isStatic: true, 
                         render: { sprite: { texture: './assets/img/ground.png'}}
                     });
@@ -50,17 +50,37 @@ class Map {
                 case 2:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100, j*100, 100, 100,  
-                    { collisionFilter: { category: 0}, 
+                    { collisionFilter: { category: CATEGORY_FLOORMAP, mask: MASK_FLOORMAP}, 
                         isStatic: true, 
                         render: { sprite: { texture: './assets/img/ground_2.png'}}
                     });
                     k++;
-                    break;
+                    break;  
 
                 case 3:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100, j*100, 100, 100,  
-                    { collisionFilter: { category: 0}, 
+                    { collisionFilter: { category: CATEGORY_FLOORMAP, mask: MASK_FLOORMAP}, 
+                        isStatic: true, 
+                        render: { sprite: { texture: './assets/img/ground_3.png'}}
+                    });
+                    k++;
+                    break;
+
+                case 4:
+                    this.bodies[0][k] = 
+                    Bodies.rectangle(i*100, j*100, 100, 100,  
+                    { collisionFilter: { category: CATEGORY_FLOORMAP, mask: MASK_FLOORMAP}, 
+                        isStatic: true, 
+                        render: { sprite: { texture: './assets/img/ground_blood.png'}}
+                    });
+                    k++;
+                    break;
+
+                case 10:
+                    this.bodies[0][k] = 
+                    Bodies.rectangle(i*100, j*100, 100, 100,  
+                    {   collisionFilter: { category: CATEGORY_FLOORMAP, mask: MASK_FLOORMAP}, 
                         isStatic: true, 
                         render: { sprite: { texture: './assets/img/stairs_up.png'}}
                     });
@@ -91,8 +111,9 @@ class Map {
                 case 2:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100, j*100 + 35, 100, 30, 
-                        { isStatic: true , 
-                        render: { sprite: { texture: './assets/img/wall_hori.png'}}
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP}, 
+                            isStatic: true, 
+                            render: { sprite: { texture: './assets/img/wall_hori.png'}}
                     });
                     k++;
                     break;
@@ -100,8 +121,9 @@ class Map {
                 case 3:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100 + 35, j*100, 30, 100, 
-                        { isStatic: true ,
-                        render: { sprite: { texture: './assets/img/wall_vert.png'}}
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP}, 
+                            isStatic: true, 
+                            render: { sprite: { texture: './assets/img/wall_vert.png'}}
                     });
                     k++;
                     break;
@@ -109,8 +131,9 @@ class Map {
                 case 4:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100, j*100 - 35, 100, 30, 
-                        { isStatic: true ,
-                        render: { sprite: { texture: './assets/img/wall_hori.png'}}
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP}, 
+                            isStatic: true, 
+                            render: { sprite: { texture: './assets/img/wall_hori.png'}}
                     });
                     k++;
                     break;
@@ -118,8 +141,9 @@ class Map {
                 case 5:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100 - 35, j*100, 30, 100, 
-                        { isStatic: true ,
-                        render: { sprite: { texture: './assets/img/wall_vert.png'}}
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP},  
+                            isStatic: true, 
+                            render: { sprite: { texture: './assets/img/wall_vert.png'}}
                     });
                     k++;
                     break;
@@ -128,9 +152,10 @@ class Map {
                 case 6:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100, j*100 - 35, 30, 100, 
-                        { isStatic: false , 
-                        frictionAir: 0.001, 
-                        render: { sprite: { texture: './assets/img/door_hori.png'}}
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP},  
+                            isStatic: false , 
+                            frictionAir: 0.001, 
+                            render: { sprite: { texture: './assets/img/door_hori.png'}}
                     });
                     var pivot = 
                     Constraint.create({
@@ -140,7 +165,7 @@ class Map {
                         stiffness: 1,
                         damping: 0.1,
                         render: {
-                            visible: false
+                            visible: true
                         }
                     });
                     var groom =
@@ -151,7 +176,7 @@ class Map {
                         stiffness: 0.005,
                         damping: 0.1,
                         render: {
-                            visible: false
+                            visible: true
                         }
                     });
                     Composite.add(this.world, [pivot, groom]);
@@ -162,25 +187,26 @@ class Map {
                 case 7:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100 - 35, j*100, 30, 95, 
-                        { isStatic: false , 
-                        frictionAir: 0.001, 
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP}, 
+                            isStatic: false , 
+                            frictionAir: 0.001, 
                         render: { sprite: { texture: './assets/img/door_vert.png'}}
                     });
                     var pivot = Constraint.create({
                         pointA: {x : this.bodies[0][k].position.x, y: this.bodies[0][k].position.y-50},
                         bodyB: this.bodies[0][k],
                         pointB: {x : 0, y: -50},
-                        stiffness: 0.05,
+                        stiffness: 1,
                         damping: 0.1,
                         render: {
                             visible: false
                         }
                     });
                     var groom = Constraint.create({
-                        pointA: {x : this.bodies[0][k].position.x + 15, y: this.bodies[0][k].position.y -50},
+                        pointA: {x : this.bodies[0][k].position.x, y: this.bodies[0][k].position.y +50},
                         bodyB: this.bodies[0][k],
-                        pointB: {x : +15, y: -50},
-                        stiffness: 0.0003,
+                        pointB: {x : 0, y: 0},
+                        stiffness: 0.002,
                         damping: 0.1,
                         render: {
                             visible: false
@@ -194,25 +220,26 @@ class Map {
                 case 8:
                     this.bodies[0][k] = 
                     Bodies.rectangle(i*100 + 35, j*100, 30, 95, 
-                        { isStatic: false , 
-                        frictionAir: 0.001,
+                        {   collisionFilter: { category: CATEGORY_WALLMAP, mask: MASK_WALLMAP}, 
+                            isStatic: false , 
+                            frictionAir: 0.001,
                             render: { sprite: { texture: './assets/img/door_vert.png'}}
                     });
                     var pivot = Constraint.create({
                         pointA: {x : this.bodies[0][k].position.x, y: this.bodies[0][k].position.y-50},
                         bodyB: this.bodies[0][k],
                         pointB: {x : 0, y: -50},
-                        stiffness: 0.05,
+                        stiffness: 1,
                         damping: 0.1,
                         render: {
                             visible: false
                         }
                     });
                     var groom = Constraint.create({
-                        pointA: {x : this.bodies[0][k].position.x + 15, y: this.bodies[0][k].position.y -50},
+                        pointA: {x : this.bodies[0][k].position.x, y: this.bodies[0][k].position.y + 100},
                         bodyB: this.bodies[0][k],
-                        pointB: {x : +15, y: -50},
-                        stiffness: 0.0003,
+                        pointB: {x : 0, y: 0},
+                        stiffness: 0.002,
                         damping: 0.1,
                         render: {
                             visible: false
@@ -245,34 +272,42 @@ class Map {
                     break;
                 // Hori Window
                 case 9:
-                    this.bodies[0].push(Composites.stack(i*100 - 50, j*100 - 40, 20, 3, 0, 0, function(x, y) {
-                        return Bodies.rectangle(x, y, 5, 5, {
-                            isSleeping : true,
-                            frictionAir : 0.01,
-                            render: {opacity: 1, fillStyle: 'white'}});
-                            }));
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 - 35, 30, 100, { 
+                        collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                        isStatic: true, 
+                        render: { 
+                            opacity: 0.8,
+                            sprite: { texture: './assets/img/window/window.png'}
+                            }
+                        }));
+                        Body.rotate(this.bodies[1][[this.bodies[1].length - 1]], Math.PI/2);
                     break;
                 // Verti Window Left
                 case 10:
-                    this.bodies[0].push(Composites.stack(i*100 - 50, j*100 - 50, 3, 20, 0, 0, function(x, y) {
-                        return Bodies.rectangle(x, y, 5, 5, {
-                            isSleeping : true,
-                            frictionAir : 0.01,
-                            render: {opacity: 1, fillStyle: 'white'}});
-                            }));
-                    break;
+                    this.bodies[1].push(Bodies.rectangle(i*100 - 35, j*100, 30, 100, { 
+                        collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                        isStatic: true, 
+                        render: { 
+                            opacity: 0.8,
+                            sprite: { texture: './assets/img/window/window.png'}
+                            }
+                        }));
+                        break;
                 // Verti Window Right
                 case 11:
-                    this.bodies[0].push(Composites.stack(i*100 + 30, j*100 - 50, 3, 20, 0, 0, function(x, y) {
-                        return Bodies.rectangle(x, y, 5, 5, {
-                            isSleeping : true,
-                            frictionAir : 0.01,
-                            render: {opacity: 1, fillStyle: 'white'}});
-                            }));
-                    break;
+                    this.bodies[1].push(Bodies.rectangle(i*100 + 35, j*100, 30, 100, { 
+                        collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                        isStatic: true, 
+                        render: { 
+                            opacity: 0.8,
+                            sprite: { texture: './assets/img/window/window.png'}
+                            }
+                        }));
+                        break;
                 // Box
                 case 12:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100, 64, 64, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP}, 
                             isStatic: false , 
                             density: 0.02, 
                             frictionAir: 0.5, 
@@ -284,7 +319,8 @@ class Map {
                 // Chair Up
                 case 13:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100 + 10, 70, 50, { 
-                            isStatic: true , 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -295,7 +331,8 @@ class Map {
                 // Chair Down
                 case 14:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100 + 10, 70, 50, { 
-                            isStatic: true , 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -307,7 +344,8 @@ class Map {
                 // Table
                 case 15:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100, 98, 65, { 
-                            isStatic: true , 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -320,7 +358,8 @@ class Map {
                 // Chair Right
                 case 16:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100, 50, 50, { 
-                            isStatic: true , 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -333,7 +372,8 @@ class Map {
                 // Chair Left
                 case 17:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100, 50, 50, { 
-                            isStatic: true , 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP}, 
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -346,7 +386,8 @@ class Map {
                 // Cupboard
                 case 18:
                     this.bodies[1].push(Bodies.rectangle(i*100, j*100, 100, 20, { 
-                            isStatic: true , 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -358,8 +399,9 @@ class Map {
                     break;
                 // Plant
                 case 19:
-                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 + 10, 65, 65, { 
-                            isStatic: true , 
+                    this.bodies[1].push(Bodies.rectangle(i*100 -10, j*100 , 65, 65, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
@@ -367,6 +409,77 @@ class Map {
                                 }
                             }));
                     Body.rotate(this.bodies[1][[this.bodies[1].length - 1]], -Math.PI / 2);
+                    break;
+
+                // Sofa Right
+                case 20:
+                    this.bodies[1].push(Bodies.rectangle(i*100 -15, j*100 - 10, 140, 70, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/sofa/sofa.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI/2);
+                    break;
+
+                // Sofa Top
+                case 21:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 - 15, 140, 70, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/sofa/sofa.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI);
+                    break;
+
+                // Sofa Bottom
+                case 22:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 + 10, 140, 70, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/sofa/sofa.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], 0);
+                    break;
+
+                 // Sofa Left
+                case 23:
+                    this.bodies[1].push(Bodies.rectangle(i*100 + 20, j*100 -15, 140, 70, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/sofa/sofa.png'}
+                                }
+                            }));
+                            Body.rotate(this.bodies[1][this.bodies[1].length - 1], -Math.PI/2);
+                    break;
+
+
+                // table Round
+                case 24:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 140, 70, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/table_round/table_round.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI/2);
                     break;
 
                 default:

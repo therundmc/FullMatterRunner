@@ -36,6 +36,8 @@ const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLE
 // get windows size
 var windowWidht = window.innerWidth;
 var windowHeight = window.innerHeight;
+
+var gunFire = document.getElementById('gunFire');
     
 
 // create engine

@@ -78,6 +78,7 @@ class Gun {
             return;
         }
 
+        gunFire.play(); 
         this.ammoLeft--;
         //Composite.remove(this.world, this.bullet);
         this.bullet = [];

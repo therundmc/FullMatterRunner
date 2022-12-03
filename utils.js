@@ -40,12 +40,12 @@ function generateParticles(body, w, h, col, row) {
     var particlesBig = Composites.stack(body.position.x, body.position.y, 2, 1, 0, 0, function(x, y) {
     return Bodies.rectangle(x, y, 20, 20, {
         collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES},
-        frictionAir : 0.01,
+        frictionAir : 0.02,
         render: {
             opacity: 1,
             sprite: { texture: imgPiecePath,
-                xScale: Common.random(0.5,1.5),
-                yScale: Common.random(0.5,1.5)},
+                xScale: Common.random(0.5,1.2),
+                yScale: Common.random(0.5,1.2)},
             }
         });
     });
@@ -58,8 +58,8 @@ function generateParticles(body, w, h, col, row) {
             render: {
                 opacity: 1,
                 sprite: { texture: imgPiecePath,
-                    xScale: Common.random(0.01,0.5),
-                    yScale: Common.random(0.01,0.5)},
+                    xScale: Common.random(0.15,0.45),
+                    yScale: Common.random(0.15,0.45)},
                 }
             });
         }); 
@@ -75,8 +75,8 @@ function applyForceToParticles(particles, bullet) {
         Matter.Body.applyForce(body, {
             x: body.position.x,
             y: body.position.y
-            }, {x: (body.position.x - bullet.position.x) * body.mass * Common.random(0.0001, 0.001) , 
-                y: (body.position.y - bullet.position.y) * body.mass * Common.random(0.0001, 0.001)})
+            }, {x: (body.position.x - bullet.position.x) * body.mass * Common.random(0.0005, 0.0008) , 
+                y: (body.position.y - bullet.position.y) * body.mass * Common.random(0.0005, 0.0008)})
     }
 
 } 

@@ -482,6 +482,40 @@ class Map {
                     Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI/2);
                     break;
 
+                    
+                // gun
+                case 50:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 50, 50, { 
+                            label: 'gun',
+                            collisionFilter: { category: CATEGORY_OBJECTS, mask: MASK_OBJECTS},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/gun_ground.png',
+                                    xScale: 2, 
+                                    yScale: 2}
+                                }
+                            }));
+                    break;
+
+                // shotgun
+                case 51:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 50, 50, {
+                            label: 'shotgun', 
+                            collisionFilter: { category: CATEGORY_OBJECTS, mask: MASK_OBJECTS},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/shotgun.png',
+                                    xScale: 2, 
+                                    yScale: 2}
+                                }
+                            }));
+                    break;
+
+
                 default:
                     console.log("Element id: %d unknow for map type %d", asset, this.type);
                     break;

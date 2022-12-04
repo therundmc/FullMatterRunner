@@ -50,8 +50,6 @@ class Player {
             }
         }
 
-        console.log(this.prevDir);
-
         var f  = 0.5;
         if (this.prevDir == 0) {
             this.moveRight(f);
@@ -118,6 +116,14 @@ class Player {
         }
     };
 
+    setLookAt(angle) {
+        Body.setAngle(this.body, angle);
+
+        if (this.gun != 0) {
+            this.gun.rotate(angle);
+        }
+    }
+
     pickGun(gunType) {
         if (this.gun != 0) {
             return;
@@ -147,7 +153,9 @@ class Player {
     }
 
     dropGun() {
-        //TODO
+        Composite.remove(this.world, this.hand);
+        this.gun.throw();
+        this.gun = 0;
     }
 
     shoot() {
@@ -183,5 +191,10 @@ class Player {
         return 0;
     }
 
-
+    isArmed() {
+        if (this.gun != 0) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -28,6 +28,7 @@ class Gun {
             case 1:
             case 'gun': 
                 this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                    label: 'gun',
                     collisionFilter: {  category: 0 }, 
                     density: 0.05, 
                     frictionAir: 0.8, 
@@ -47,6 +48,7 @@ class Gun {
             case 2:
             case 'shotgun': 
                 this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                    label: 'shotgun',
                     collisionFilter: {  category: 0 }, 
                     density: 0.05, 
                     frictionAir: 0.8, 
@@ -78,9 +80,9 @@ class Gun {
             return;
         }
 
-        gunFire.play(); 
+        //gunFire.play(); 
         this.ammoLeft--;
-        //Composite.remove(this.world, this.bullet);
+        Composite.remove(this.world, this.bullet);
         this.bullet = [];
         for (let i = 0; i < this.nbBulletPerShot; i++) {
         // bulletdd
@@ -128,6 +130,14 @@ class Gun {
             setTimeout(this.shootCoolDowntimer, this.FireRate);
             coolDown = true;
         }
+    }
+
+    throw() {
+        Body.applyForce(this.body, {
+            x: this.body.position.x,
+            y: this.body.position.y
+            },  {x: 1, y: 1}
+        );
     }
 
     reload() {

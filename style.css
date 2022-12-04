@@ -7,3 +7,8 @@ body {
   position: absolute;
   text-align: center;
 }
+
+@font-face {
+  font-family: joystix;
+  src: url("assets/font/joystix.ttf");
+}

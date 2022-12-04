@@ -51,15 +51,15 @@ function generateParticles(body, w, h, col, row) {
     });
     Composite.add(world, particlesBig);
 
-    var particlesLittle = Composites.stack(body.position.x, body.position.y, 4, 4, 0, 0, function(x, y) {
+    var particlesLittle = Composites.stack(body.position.x, body.position.y, 6, 6, 0, 0, function(x, y) {
         return Bodies.rectangle(x, y, 5, 5, {
             collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES},
             frictionAir : 0.01,
             render: {
                 opacity: 1,
                 sprite: { texture: imgPiecePath,
-                    xScale: Common.random(0.15,0.45),
-                    yScale: Common.random(0.15,0.45)},
+                    xScale: Common.random(0.05,0.3),
+                    yScale: Common.random(0.05,0.3)},
                 }
             });
         }); 
@@ -75,8 +75,8 @@ function applyForceToParticles(particles, bullet) {
         Matter.Body.applyForce(body, {
             x: body.position.x,
             y: body.position.y
-            }, {x: (body.position.x - bullet.position.x) * body.mass * Common.random(0.0005, 0.0008) , 
-                y: (body.position.y - bullet.position.y) * body.mass * Common.random(0.0005, 0.0008)})
+            }, {x: (body.position.x - bullet.position.x) * body.mass * Common.random(0.0003, 0.0008) , 
+                y: (body.position.y - bullet.position.y) * body.mass * Common.random(0.0003, 0.0008)})
     }
 
 } 

@@ -165,7 +165,7 @@ class Map {
                         stiffness: 1,
                         damping: 0.1,
                         render: {
-                            visible: true
+                            visible: false
                         }
                     });
                     var groom =
@@ -176,7 +176,7 @@ class Map {
                         stiffness: 0.005,
                         damping: 0.1,
                         render: {
-                            visible: true
+                            visible: false
                         }
                     });
                     Composite.add(this.world, [pivot, groom]);
@@ -482,6 +482,77 @@ class Map {
                     Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI/2);
                     break;
 
+                // table Computer
+                case 25:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 98, 65, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/table_computer/table_computer.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI/2);
+                    break;
+
+                // table Computer hori
+                case 26:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 98, 65, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/table_computer/table_computer.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], 0);
+                    break;
+
+                // Chair Bottom
+                case 27:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 50, 50, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/chair/chair.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], 0);
+                    break;
+
+                // Chair Up
+                case 28:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 50, 50, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/chair/chair.png'}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI);
+                    break;
+
+                // Chiotte Right
+                case 29:
+                    this.bodies[1].push(Bodies.rectangle(i*100 - 10, j*100, 66, 72, { 
+                            collisionFilter: { category: CATEGORY_DYNMAP, mask: MASK_DYNMAP},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/chiotte/chiotte.png',
+                                xScale: 1.5, 
+                                yScale: 1.5}
+                                }
+                            }));
+                    Body.rotate(this.bodies[1][this.bodies[1].length - 1], Math.PI/2);
+                    break;
                     
                 // gun
                 case 50:
@@ -508,7 +579,23 @@ class Map {
                             density: 0.1, 
                             frictionAir: 1, 
                             render: { 
-                                sprite: { texture: './assets/img/shotgun.png',
+                                sprite: { texture: './assets/img/shotgun_ground.png',
+                                    xScale: 2, 
+                                    yScale: 2}
+                                }
+                            }));
+                    break;
+
+                // rifle
+                case 52:
+                    this.bodies[1].push(Bodies.rectangle(i*100, j*100 , 50, 50, {
+                            label: 'rifle', 
+                            collisionFilter: { category: CATEGORY_OBJECTS, mask: MASK_OBJECTS},
+                            isStatic: true, 
+                            density: 0.1, 
+                            frictionAir: 1, 
+                            render: { 
+                                sprite: { texture: './assets/img/rifle_ground.png',
                                     xScale: 2, 
                                     yScale: 2}
                                 }

@@ -80,3 +80,19 @@ function applyForceToParticles(particles, bullet) {
     }
 
 } 
+
+function updateAnglePlayerMouse() {
+    angle = Matter.Vector.angle(player.getRelativePos(cameraPadding), mouse.position);
+    player.setLookAt(angle + Math.PI / 2);
+}
+
+function fts(force) {
+    return force * (1 / engine.timing.timeScale);
+};
+
+function startSlowMo() {
+    engine.timing.timeScale = 0.2;
+};
+function stopSlowMo() {
+    engine.timing.timeScale = 1;
+};

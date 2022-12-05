@@ -19,6 +19,7 @@ class Gun {
 
         this.shootTimer = 0;
         this.FireRate = 0;
+        this.recul = 0;
 
         this.draw();
     }
@@ -43,6 +44,7 @@ class Gun {
                 this.ammoLeft = this.ammoCapacity;
                 this.nbBulletPerShot = 1;
                 this.FireRate = 200;
+                this.recul = 1.5;
                 break;
 
             case 2:
@@ -63,6 +65,28 @@ class Gun {
                 this.ammoLeft = this.ammoCapacity;
                 this.nbBulletPerShot = 5;
                 this.FireRate = 1000;
+                this.recul = 5;
+                break;
+
+            case 3:
+            case 'rifle': 
+                this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                    label: 'shotgun',
+                    collisionFilter: {  category: 0 }, 
+                    density: 0.05, 
+                    frictionAir: 0.8, 
+                    isStatic: false , 
+                    render: { 
+                        sprite: { texture: './assets/img/rifle.png', xScale: 2, yScale:2 }
+                        }
+                    });
+                Composite.add(this.world, this.body);
+                Body.setAngle(this.body, this.lookAt);
+                this.ammoCapacity = 30;
+                this.ammoLeft = this.ammoCapacity;
+                this.nbBulletPerShot = 1;
+                this.FireRate = 80;
+                this.recul = 1.5;
                 break;
 
             default:
@@ -82,11 +106,12 @@ class Gun {
 
         //gunFire.play(); 
         this.ammoLeft--;
-        Composite.remove(this.world, this.bullet);
         this.bullet = [];
+        // bullet
         for (let i = 0; i < this.nbBulletPerShot; i++) {
-        // bulletdd
-            this.bullet.push(Bodies.rectangle(this.body.position.x + 20*i, this.body.position.y + i, 5, 10, {
+            var dispX = (i - this.nbBulletPerShot / 2 ) * 10 * Math.cos(this.lookAt);
+            var dispY = (i - this.nbBulletPerShot / 2 ) * 10 * Math.sin(this.lookAt);
+            this.bullet.push(Bodies.rectangle(this.body.position.x + dispX, this.body.position.y +  dispY, 5, 10, {
                 collisionFilter: {  category: CATEGORY_BULLET, mask: MASK_BULLET }, 
                 density: 0.05, 
                 frictionAir: 0.001, 
@@ -94,8 +119,10 @@ class Gun {
                 render: { sprite: { texture: './assets/img/bullet.png', xScale:2, yScale:2 }
                 }}));
 
-            var fx = Math.cos(this.lookAt - Math.PI/2) * 0.1;
-            var fy = Math.sin(this.lookAt - Math.PI/2) * 0.1;
+            Body.setAngle(this.bullet[i], this.lookAt);
+
+            var fx = Math.cos(this.lookAt - Math.PI/2) * 0.15;
+            var fy = Math.sin(this.lookAt - Math.PI/2) * 0.15;
 
             Body.applyForce(this.bullet[i], {
                 x: this.bullet[i].position.x,
@@ -105,6 +132,14 @@ class Gun {
         }
         Composite.add(this.world, this.bullet);
 
+        var fx = Math.cos(this.lookAt - Math.PI/2) * this.recul;
+        var fy = Math.sin(this.lookAt - Math.PI/2) * this.recul;
+        // recul
+        Body.applyForce(this.body, {
+            x: this.body.position.x,
+            y: this.body.position.y
+            },  {x: -fx, y: -fy}
+        );
 
         // douille
         this.douille.push(Bodies.rectangle(this.body.position.x, this.body.position.y, 2, 4, { 

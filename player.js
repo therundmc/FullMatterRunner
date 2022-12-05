@@ -19,16 +19,33 @@ class Player {
     };
 
     draw() {
-        this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
-            collisionFilter: {  category: this.category, mask: this.mask}, 
-            density: 0.05, 
-            frictionAir: 0.8, 
-            isStatic: false , 
-            render: { sprite: { texture: this.asset }}
-            });
-        Composite.add(this.world, this.body);
-        Body.setAngle(this.body, Math.PI/2);
-        this.lookAt =  Math.PI/2;
+        if (this.category == CATEGORY_PLAYER) {
+            this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                collisionFilter: {  category: this.category, mask: this.mask}, 
+                density: 0.05, 
+                frictionAir: 0.8, 
+                isStatic: false , 
+                render: { sprite: { texture: this.asset }}
+                });
+            Composite.add(this.world, this.body);
+            Body.setAngle(this.body, Math.PI/2);
+            this.lookAt =  Math.PI/2;
+        }
+        else {
+            this.body = Bodies.circle(this.x, this.y, this.w/2, {
+                collisionFilter: {  category: this.category, mask: this.mask}, 
+                density: 0.01, 
+                frictionAir: 0.2, 
+                restitution: 0.0,
+                isStatic: false , 
+                render: { sprite: { texture: this.asset }}
+                });
+            Composite.add(this.world, this.body);
+            Body.setAngle(this.body, Math.PI/2);
+            this.lookAt =  Math.PI/2;
+        }
+
+
     };
 
     move(x, y) {
@@ -40,8 +57,8 @@ class Player {
 
     moveRandom() {
         var collisionArray = getCollisionArray(CATEGORY_WALLMAP, this.category);
-        var dir = this.prevDir;
-        if (collisionArray.length > 0){
+        var collisionArray2 = getCollisionArray(CATEGORY_DYNMAP, this.category);
+        if (collisionArray.length > 0 || collisionArray2.length > 0){
             if (this.prevDir < 3)  {
                 this.prevDir ++;
             }
@@ -50,18 +67,22 @@ class Player {
             }
         }
 
-        var f  = 0.5;
+        var f  = 0.2;
         if (this.prevDir == 0) {
             this.moveRight(f);
+            this.setLookAt(Math.PI/2);
         }
         else if (this.prevDir == 1){
             this.moveLeft(f);
+            this.setLookAt(3*Math.PI/2);
         }
         else if (this.prevDir == 2){
             this.moveUp(f);
+            this.setLookAt(0);
         }
         else if (this.prevDir == 3){
             this.moveDown(f);
+            this.setLookAt(Math.PI);
         }
 
     };
@@ -71,7 +92,6 @@ class Player {
             x: this.body.position.x,
             y: this.body.position.y
             }, {x: f, y: 0})
-            this.rotate(Math.PI/2);
     }
 
     moveLeft(f = 1) {
@@ -79,7 +99,6 @@ class Player {
             x: this.body.position.x,
             y: this.body.position.y
             }, {x: -f, y: 0})
-            this.rotate(3*Math.PI/2);
     }
 
     moveUp(f = 1) {
@@ -87,7 +106,6 @@ class Player {
             x: this.body.position.x,
             y: this.body.position.y
             }, {x: 0, y: -f})
-            this.rotate(0);
     }
 
     moveDown(f = 1) {
@@ -95,33 +113,19 @@ class Player {
             x: this.body.position.x,
             y: this.body.position.y
             }, {x: 0, y: f})
-            this.rotate(Math.PI);
     }
 
 
-    rotate(angle, stepAngle = Math.PI/15) {
-        if (this.lookAt < angle) {
-            this.lookAt += stepAngle;
-        }
-        else if (this.lookAt > angle) {
-            this.lookAt -=  stepAngle;
-        }
-        else {
-            this.lookAt = angle;
-        }
+    rotate() {
         Body.setAngle(this.body, this.lookAt);
-
         if (this.gun != 0) {
             this.gun.rotate(this.lookAt);
         }
     };
 
     setLookAt(angle) {
-        Body.setAngle(this.body, angle);
-
-        if (this.gun != 0) {
-            this.gun.rotate(angle);
-        }
+        this.lookAt = angle;
+        this.rotate();
     }
 
     pickGun(gunType) {
@@ -143,7 +147,7 @@ class Player {
             pointA: {x : ox, y: oy},
             bodyB: this.gun.body,
             pointB: {x : 0, y: 0},
-            stiffness: 1,
+            stiffness: 0.1,
             damping: 0.1,
             render: {
                 visible: false
@@ -189,6 +193,10 @@ class Player {
             return this.gun.ammoCapacity;
         }
         return 0;
+    }
+
+    getRelativePos(padding) {
+        return Matter.Vector.create(padding.x, padding.y);
     }
 
     isArmed() {

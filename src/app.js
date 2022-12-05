@@ -139,8 +139,8 @@ var floorMap    = new Map(0, 0, floorMapArray, 0, engine.world),
     DynMap      = new Map(0, 0, DynMapArray, 2, engine.world);
 
 // Player Class var
-var player  = new Player(400, 1750, 51, 29, './assets/img/patrick.png', CATEGORY_PLAYER, MASK_PLAYER, engine.world),
-    thug    = new Player(300, 1200, 100, 50, './assets/img/thug_1.png', CATEGORY_ENEMY, MASK_ENEMY, engine.world);
+var player  = new Player(400, 1750, 51, 29, './assets/img/patrick.png', engine.world),
+    thug    = new Player(300, 1200, 50, 50, './assets/img/thug_1.png', engine.world);
 
 // Text Class var
 var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),

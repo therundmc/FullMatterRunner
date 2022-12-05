@@ -1,13 +1,13 @@
 class Player {
-    constructor(x, y, w, h, asset, category, mask, world) {
+    constructor(x, y, w, h, asset, world) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.asset = asset;
         this.world = world;
-        this.category = category;
-        this.mask = mask;
+        this.category = CATEGORY_PLAYER;
+        this.mask = MASK_PLAYER;
         this.body;
         this.lookAt = 0;
         this.gun = 0;
@@ -19,33 +19,16 @@ class Player {
     };
 
     draw() {
-        if (this.category == CATEGORY_PLAYER) {
-            this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
-                collisionFilter: {  category: this.category, mask: this.mask}, 
-                density: 0.05, 
-                frictionAir: 0.8, 
-                isStatic: false , 
-                render: { sprite: { texture: this.asset }}
-                });
-            Composite.add(this.world, this.body);
-            Body.setAngle(this.body, Math.PI/2);
-            this.lookAt =  Math.PI/2;
-        }
-        else {
-            this.body = Bodies.circle(this.x, this.y, this.w/2, {
-                collisionFilter: {  category: this.category, mask: this.mask}, 
-                density: 0.01, 
-                frictionAir: 0.2, 
-                restitution: 0.0,
-                isStatic: false , 
-                render: { sprite: { texture: this.asset }}
-                });
-            Composite.add(this.world, this.body);
-            Body.setAngle(this.body, Math.PI/2);
-            this.lookAt =  Math.PI/2;
-        }
-
-
+        this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+            collisionFilter: {  category: this.category, mask: this.mask}, 
+            density: 0.05, 
+            frictionAir: 0.8, 
+            isStatic: false , 
+            render: { sprite: { texture: this.asset }}
+            });
+        Composite.add(this.world, this.body);
+        Body.setAngle(this.body, Math.PI/2);
+        this.lookAt =  Math.PI/2;
     };
 
     move(x, y) {
@@ -59,26 +42,27 @@ class Player {
         var collisionArray = getCollisionArray(CATEGORY_WALLMAP, this.category);
         var collisionArray2 = getCollisionArray(CATEGORY_DYNMAP, this.category);
         if (collisionArray.length > 0 || collisionArray2.length > 0){
-            if (this.prevDir < 3)  {
-                this.prevDir ++;
-            }
-            else {
-                this.prevDir = 0;
-            }
+            // if (this.prevDir < 3)  {
+            //     this.prevDir ++;
+            // }
+            // else {
+            //     this.prevDir = 0;
+            // }
+            this.prevDir = Math.round(Common.random(0,3));
         }
 
-        var f  = 0.2;
+        var f  = 2;
         if (this.prevDir == 0) {
             this.moveRight(f);
             this.setLookAt(Math.PI/2);
         }
         else if (this.prevDir == 1){
-            this.moveLeft(f);
-            this.setLookAt(3*Math.PI/2);
-        }
-        else if (this.prevDir == 2){
             this.moveUp(f);
             this.setLookAt(0);
+        }
+        else if (this.prevDir == 2){
+            this.moveLeft(f);
+            this.setLookAt(3*Math.PI/2);
         }
         else if (this.prevDir == 3){
             this.moveDown(f);

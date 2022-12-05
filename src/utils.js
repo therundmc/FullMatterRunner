@@ -1,3 +1,4 @@
+
 function getCollisionArray(categoryA, categoryB) {
     var bodiesA = getAllBodiesFilterdByCategory(categoryA);
     var bodiesB = getAllBodiesFilterdByCategory(categoryB);
@@ -65,8 +66,7 @@ function generateParticles(body, w, h, col, row) {
         }); 
     Composite.add(world, particlesLittle);
 
-    var particles = [...particlesBig.bodies, ...particlesLittle.bodies];
-    return particles;
+    return [...particlesBig.bodies, ...particlesLittle.bodies];
 }
 
 function applyForceToParticles(particles, bullet) {

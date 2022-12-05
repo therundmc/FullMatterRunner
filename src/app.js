@@ -38,7 +38,7 @@ const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLE
 var windowWidht = window.innerWidth;
 var windowHeight = window.innerHeight;
 
-const cameraPadding = Matter.Vector.create(windowWidht*0.5, windowHeight*0.5); 
+const cameraPadding = Matter.Vector.create(windowWidht*0.6, windowHeight*0.6); 
 
 var gunFire = document.getElementById('gunFire');
     
@@ -139,8 +139,13 @@ var floorMap    = new Map(0, 0, floorMapArray, 0, engine.world),
     DynMap      = new Map(0, 0, DynMapArray, 2, engine.world);
 
 // Player Class var
-var player  = new Player(400, 1750, 51, 29, './assets/img/patrick.png', engine.world),
-    thug    = new Player(300, 1200, 50, 50, './assets/img/thug_1.png', engine.world);
+var player  = new Player(400, 1750, 51, 29, './assets/img/patrick.png', engine.world);
+
+// Ennemy Class var
+var thug = new Array();
+thug.push(new Enemy(300, 700, 80, 80, './assets/img/thug/thug.png', 1, engine.world));
+thug.push(new Enemy(200, 200, 80, 80, './assets/img/thug/thug.png', 2,engine.world));
+thug.push(new Enemy(1000, 1000, 80, 80, './assets/img/thug/thug.png', 3, engine.world));
 
 // Text Class var
 var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),
@@ -150,6 +155,8 @@ var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),
 // add mouse control
 var mouse = Mouse.create(document.body);
 
+setInterval(moveThug, 50);
+
 Render.run(render);
 
 // create runner
@@ -158,9 +165,6 @@ var runner = Runner.create({
     delta: 1000 / 60,
 });
 Runner.run(runner, engine);
-
-
-setInterval(moveThug, 50)
 
 // keyboard control
 const keyDownHandlers = {
@@ -231,7 +235,8 @@ Matter.Events.on(engine, "beforeUpdate", event => {
 
 function handleCollisonWithBulletDestruction() {
 
-    var collisionArray = getCollisionArray(CATEGORY_DYNMAP, CATEGORY_BULLET);
+    var collisionArray = [...getCollisionArray(CATEGORY_DYNMAP, CATEGORY_BULLET), 
+        ...getCollisionArray(CATEGORY_ENEMY, CATEGORY_BULLET)];
 
     for(i = 0; i < collisionArray.length; i++) {
 
@@ -301,5 +306,7 @@ function updateBulletCounter() {
 };
 
 function moveThug() {
-    thug.moveRandom();
+    thug.forEach(item => {
+        item.moveRandom();
+    })
 };

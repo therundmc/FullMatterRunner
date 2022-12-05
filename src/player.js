@@ -38,39 +38,6 @@ class Player {
             }, {x: x, y: y})
     };
 
-    moveRandom() {
-        var collisionArray = getCollisionArray(CATEGORY_WALLMAP, this.category);
-        var collisionArray2 = getCollisionArray(CATEGORY_DYNMAP, this.category);
-        if (collisionArray.length > 0 || collisionArray2.length > 0){
-            // if (this.prevDir < 3)  {
-            //     this.prevDir ++;
-            // }
-            // else {
-            //     this.prevDir = 0;
-            // }
-            this.prevDir = Math.round(Common.random(0,3));
-        }
-
-        var f  = 2;
-        if (this.prevDir == 0) {
-            this.moveRight(f);
-            this.setLookAt(Math.PI/2);
-        }
-        else if (this.prevDir == 1){
-            this.moveUp(f);
-            this.setLookAt(0);
-        }
-        else if (this.prevDir == 2){
-            this.moveLeft(f);
-            this.setLookAt(3*Math.PI/2);
-        }
-        else if (this.prevDir == 3){
-            this.moveDown(f);
-            this.setLookAt(Math.PI);
-        }
-
-    };
-
     moveRight(f = 1) {
         Matter.Body.applyForce(this.body, {
             x: this.body.position.x,

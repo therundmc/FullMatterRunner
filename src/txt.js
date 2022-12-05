@@ -22,9 +22,7 @@ class Txt {
                     color:this.color,
                     size:this.size,
                     family:"joystix",
-                },
-            },
-        });
+        }}});
         Composite.add(this.world, this.body);
     }
 

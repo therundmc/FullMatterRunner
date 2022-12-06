@@ -15,12 +15,7 @@ class Enemy {
         this.hand;
         this.prevDir = Matter.Vector.create(1, 0);
 
-        self = this,
-
         this.draw();
-        //setInterval(moveThug, 50);
-
-
     };
 
     draw() {
@@ -36,9 +31,6 @@ class Enemy {
         Composite.add(this.world, this.body);
         Body.setAngle(this.body, Math.PI/2);
         this.lookAt =  Math.PI/2;
-
-        var thisthis = this;
-        setInterval(thisthis.moveRandom, 50);
     };
 
     moveRandom() {

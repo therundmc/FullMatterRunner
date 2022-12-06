@@ -85,7 +85,7 @@ class Gun {
                 this.ammoCapacity = 30;
                 this.ammoLeft = this.ammoCapacity;
                 this.nbBulletPerShot = 1;
-                this.FireRate = 80;
+                this.FireRate = 120;
                 this.recul = 1.5;
                 break;
 

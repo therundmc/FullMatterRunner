@@ -47,12 +47,13 @@ class Enemy {
         var vertices = [
             {x : A.x , y : A.y},
             {x : B.x , y : B.y},
-            {x : C.x , y : C.y}
+            {x : C.x , y : C.y},
         ];
 
         this.fov = Bodies.fromVertices(this.body.position.x + 300, this.body.position.y+ 300, vertices, {
             collisionFilter: {  category: 0, mask: 0},
-            render: { fillStyle: '#FFFFFF', opacity: 0.3 }
+            render: { fillStyle: '#FFFFFF', opacity: 0.3 },
+            isSensor: true
         });
         Body.rotate(this.fov, -Math.PI/4,  {x : this.body.position.x , y : this.body.position.y});
         Composite.add(this.world, this.fov);

@@ -71,7 +71,7 @@ var render = Render.create({
 const floorMapArray = [
     [00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,00,00,00,00,00],
-    [00,03,03,03,03,03,01,04,01,03,03,03,03,03,03,00,00,00,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,00,00,00,00,00],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,01,01,01,01,10],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,01,01,01,01,10],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,01,01,01,01,10],
@@ -83,7 +83,7 @@ const floorMapArray = [
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
-    [00,03,03,03,03,03,01,01,04,03,03,03,03,03,03,03,03,03,00,00],
+    [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
     [00,03,03,03,03,03,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
     [00,10,01,01,01,01,01,01,01,03,03,03,03,03,03,03,03,03,00,00],
@@ -154,8 +154,8 @@ thug.push(new Enemy(1000, 1000, 80, 80, './assets/img/thug/thug.png', 3, engine.
 thug.push(new Enemy(800, 500, 80, 80, './assets/img/thug/thug.png', 4, engine.world));
 thug.push(new Enemy(100, 1500, 80, 80, './assets/img/thug/thug.png', 5, engine.world));
 
-thug.push(new Enemy(1200, 200, 80, 80, './assets/img/thug/thug.png', 6, engine.world));
-thug.push(new Enemy(1000, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
+// thug.push(new Enemy(1200, 200, 80, 80, './assets/img/thug/thug.png', 6, engine.world));
+// thug.push(new Enemy(1000, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
 
 // Text Class var
 var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),
@@ -258,12 +258,6 @@ function handleCollisonWithBulletDestruction() {
 
         Composite.remove(world, body);
         Composite.remove(world, bullet);
-
-        var triggerSlowMo = Common.random(0,10)
-        if (triggerSlowMo < 1) {
-            setTimeout(startSlowMo, 100);
-            setTimeout(stopSlowMo, 600);
-        } 
     }
 };
 
@@ -285,12 +279,12 @@ function handleCollisonWithBulletDismemberment() {
 
         updateFloorWithBlood(ennemy);
 
-        Composite.remove(world, ennemy);
+        thug[findEnnemyByLabel(ennemy.label)].kill();
         Composite.remove(world, bullet);
 
-        var triggerSlowMo = Common.random(0,10)
-        if (triggerSlowMo < 1) {
-            setTimeout(startSlowMo, 100);
+        var triggerSlowMo = Common.random(0,1)
+        if (triggerSlowMo < 0.2) {
+            setTimeout(startSlowMo, 0);
             setTimeout(stopSlowMo, 600);
         } 
     }
@@ -346,6 +340,7 @@ function updateBulletCounter() {
 
 function moveThug() {
     thug.forEach(item => {
-        item.moveRandom();
+        item.Ai(player.body);
+        //item.moveRandom();
     })
 };

@@ -11,6 +11,7 @@ function getCollisionArray(categoryA, categoryB) {
     return collisionArray;
 }
 
+
 function getAllBodiesFilterdByCategory(category){
     var bodies = Composite.allBodies(world);
     var bodiesFiltered = new Array;
@@ -26,6 +27,7 @@ function getAllBodiesFilterdByCategory(category){
     }
     return bodiesFiltered;
 }
+
 
 function generateParticles(body, w, h, col, row) {
 
@@ -69,6 +71,7 @@ function generateParticles(body, w, h, col, row) {
     return [...particlesBig.bodies, ...particlesLittle.bodies];
 }
 
+
 function generateDismemberment(body) {
 
     var bodiesElement = new Array();
@@ -91,6 +94,7 @@ function generateDismemberment(body) {
     return bodiesElement;
 }
 
+
 function generateBlood(body) {
     var bloodParticles = Composites.stack(body.position.x, body.position.y, 2, 2, 0, 0, function(x, y) {
         return Bodies.rectangle(x, y, 5, 5, {
@@ -109,6 +113,7 @@ function generateBlood(body) {
     return bloodParticles.bodies;
 }
 
+
 function applyForceToParticles(particles, bullet) {
     for (let i = 0; i < particles.length; i++) {
         var body = particles[i];
@@ -121,6 +126,7 @@ function applyForceToParticles(particles, bullet) {
 
 } 
 
+
 function applyForceToBodyPieces(pieces, bullet) {
     for (let i = 0; i < pieces.length; i++) {
         var body = pieces[i];
@@ -132,6 +138,7 @@ function applyForceToBodyPieces(pieces, bullet) {
     }
 } 
 
+
 function applyForceToBloodParticles(bloodParticles) {
     for (let i = 0; i < bloodParticles.length; i++) {
         var body = bloodParticles[i];
@@ -142,6 +149,7 @@ function applyForceToBloodParticles(bloodParticles) {
                 y: Common.random(-1, 1) * body.mass * Common.random(0.01, 0.05)})
     }
 } 
+
 
 function updateFloorWithBlood(body) {
     detectorBody = Bodies.rectangle(body.position.x, body.position.y, 50, 50, {
@@ -169,18 +177,31 @@ function updateFloorWithBlood(body) {
 
 }
 
+
 function updateAnglePlayerMouse() {
     angle = Matter.Vector.angle(player.getRelativePos(cameraPadding), mouse.position);
     player.setLookAt(angle + Math.PI / 2);
 }
 
+
 function fts(force) {
     return force * (1 / engine.timing.timeScale);
 };
 
+
 function startSlowMo() {
     engine.timing.timeScale = 0.2;
 };
+
+
 function stopSlowMo() {
     engine.timing.timeScale = 1;
 };
+
+function findEnnemyByLabel(label) {
+    for (let i = 0; i < thug.length; i++) {
+        if (thug[i].body.label == label) {
+            return i;
+        }
+    }
+}

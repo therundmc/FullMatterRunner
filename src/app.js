@@ -46,7 +46,7 @@ const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLE
 var windowWidht = window.innerWidth;
 var windowHeight = window.innerHeight;
 
-const cameraPadding = Matter.Vector.create(windowWidht*0.5, windowHeight*0.5); 
+const cameraPadding = Matter.Vector.create(windowWidht*0.9, windowHeight*0.9); 
 
 var gunFire = document.getElementById('gunFire');
     
@@ -158,7 +158,7 @@ thug.push(new Enemy(300, 700, 51, 29, './assets/img/thug/thug.png', 1, engine.wo
 thug.push(new Enemy(800, 500, 51, 29, './assets/img/thug/thug.png', 4, engine.world));
 
 thug.push(new Enemy(1200, 200, 80, 80, './assets/img/thug/thug.png', 6, engine.world));
-thug.push(new Enemy(800, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
+thug.push(new Enemy(1300, 1300, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
 
 // Text Class var
 var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),

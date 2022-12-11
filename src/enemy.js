@@ -18,8 +18,8 @@ class Enemy {
         this.dir = Matter.Vector.create(1, 0);
         this.lookAt = 0;
         this.gun = 0;
-        this.hand;
         this.prevAngle = 0;
+        this.alive = true;
 
         this.state = IDLE;
 
@@ -37,71 +37,39 @@ class Enemy {
             render: { sprite: { texture: this.asset }}
             });
         Composite.add(this.world, this.body);
-        Body.setAngle(this.body, Math.PI/2);
-        this.lookAt =  Math.PI/2;
 
-        var A = {x : 0 , y : 0},
-            B = {x : 300 , y : 600},
-            C = {x : 600 , y : 300};
-
-        var vertices = [
-            {x : A.x , y : A.y},
-            {x : B.x , y : B.y},
-            {x : C.x , y : C.y},
-        ];
-
-        this.fov = Bodies.fromVertices(this.body.position.x + 300, this.body.position.y+ 300, vertices, {
-            collisionFilter: {  category: 0, mask: 0},
-            render: { fillStyle: '#FFFFFF', opacity: 0.3 },
-            isSensor: true
-        });
-        Body.rotate(this.fov, -Math.PI/4,  {x : this.body.position.x , y : this.body.position.y});
-        Composite.add(this.world, this.fov);
-
-        // geometry rocks !
-        var a = Matter.Vector.magnitude(B);
-        var b = Matter.Vector.magnitude(Matter.Vector.sub(C, B));
-        var h = Math.sqrt(Math.pow(a, 2) - (Math.pow(b/2, 2)));
-        var g = Math.round(2 * h / 3);
-
-        this.constraitFov = Constraint.create({
-            bodyA: this.body,
-            pointA: {x : 0, y: 0},
-            bodyB: this.fov,
-            pointB: {x : -g, y: 0},
-            stiffness: 0.8,
-            damping: 0.1,
-            render: {
-                visible: true
-            }
-        });
-        Composite.add(this.world, this.constraitFov);
+        this.gun = new Gun(this.body.position.x, this.body.position.y + 20, 8, 32, 'gun', this.lookAt, this.body, CATEGORY_ENEMY_BULLET, MASK_ENEMY_BULLET, this.world);
+        this.fov = new Ray(this.body, Math.PI/6, 600, this.label, this.world);
     };
 
     Ai(player) {
-        this.getState();
+        if (!this.alive) {
+            return;
+        }
 
         switch(this.state) {
             case IDLE:
-                this.moveRandom();
+                this.getState(player);
+                this.moveRandom(player)
                 break;
             
             case ALARM:
-                this.setLookAtPlayer(player) 
+                this.setLookAtPlayer(player);
+                this.gun.shoot();
+                if (this.gun.ammoLeft <= 0){
+                    this.gun.reload();
+                }
                 break;
         }
-        this.updateFoV();
     }
 
-    getState() {
-        this.state = ALARM;
-
-    }
-
-    updateFoV() {
-        var angle = -this.prevAngle + this.lookAt;
-        Body.rotate(this.fov, angle,  {x : this.body.position.x , y : this.body.position.y});
-        this.prevAngle = this.lookAt;
+    getState(player) {
+        if (this.fov.playerDetected(player)) {
+            this.state = ALARM;
+        }
+        else {
+            this.state = IDLE;
+        }
     }
 
     moveRandom() {
@@ -133,15 +101,13 @@ class Enemy {
         this.dir.x = Math.round(this.dir.x);
         this.dir.y = Math.round(this.dir.y);
 
-        console.log(this.body.angle);
-
         this.move(this.dir);
         this.setLookAt(this.dir);
     };
 
     setLookAt(dir) {
-        Body.setAngle(this.body, Math.atan2(dir.y, dir.x) + Math.PI/2);
-        this.updateFoV();
+        this.lookAt = Math.atan2(dir.y, dir.x);
+        this.rotate(this.lookAt);
     }
 
     move(dir) {
@@ -151,33 +117,24 @@ class Enemy {
             }, {x: dir.x, y: dir.y})
     };
 
-    setLookAtPlayer(body) {
-        this.lookAt = Matter.Vector.angle(this.body.position, body.position);
-        this.rotatePolar(this.lookAt);
-
-        var dir = Matter.Vector.create(Math.cos( this.lookAt ), Math.sin( this.lookAt ));
+    setLookAtPlayer(player) {
+        this.lookAt = Matter.Vector.angle(this.body.position, player.position);
+        this.rotate(this.lookAt);
     };
 
-    rotateCartesian(dir) {
-        var angle = Math.atan2(dir.y, dir.x) + Math.PI/2; //Notice that y is first!
-        Body.setAngle(this.body, angle);
+    rotate(angle) {
         this.lookAt = angle;
+        Body.setAngle(this.body, this.lookAt + Math.PI/2);
+        this.fov.rotate(this.lookAt, player);
         if (this.gun != 0) {
-            this.gun.rotate(this.lookAt);
+            this.gun.rotate(this.lookAt + Math.PI/2);
         }
     };
 
-    rotatePolar(angle) {
-        Body.setAngle(this.body, angle + Math.PI/2);
-        this.lookAt = angle;
-        if (this.gun != 0) {
-            this.gun.rotate(this.lookAt);
-        }
-    };
-
-    kill() {
+    die() {
+        this.alive = false;
+        this.fov.destroy();
         Composite.remove(this.world, this.body);
-        Composite.remove(this.world, this.fov);
-        Composite.remove(this.world, this.constraitFov);
+        //Composite.remove(this.world, this.hand);
     }
 }

@@ -1,7 +1,7 @@
 var coolDown = false;
 
 class Gun {
-    constructor(x, y, w, h, type, angle, world) {
+    constructor(x, y, w, h, type, angle, parent, category, mask, world) {
         this.x = x;
         this.y = y;
         this.w = w;
@@ -9,9 +9,16 @@ class Gun {
         this.type = type;
         this.world = world;
         this.lookAt = angle;
+        this.parent = parent;
+        this.category = category;
+        this.mask = mask;
         this.body;
+        this.hand;
         this.douille = new Array;
         this.bullet = new Array;
+
+        this.ox = 0;
+        this.oy = 0;
 
         this.ammoLeft = 0;
         this.ammoCapacity = 0;
@@ -25,10 +32,20 @@ class Gun {
     }
 
     draw() {
+        this.ox = (Math.cos(this.lookAt - Math.PI/2) * 40);
+        this.oy = (Math.sin(this.lookAt - Math.PI/2) * 40);
+        if (Math.abs(this.ox) > Math.abs(this.ox)) {
+            this.oy += 20;
+        }
+        else {
+            this.ox += 20;
+        }
+
+        console.log(this.ox, this.oy)
         switch(this.type) {
             case 1:
             case 'gun': 
-                this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                this.body = Bodies.rectangle(this.x + this.ox, this.y + this.oy, this.w, this.h, {
                     label: 'gun',
                     collisionFilter: {  category: 0 }, 
                     density: 0.05, 
@@ -49,7 +66,7 @@ class Gun {
 
             case 2:
             case 'shotgun': 
-                this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                this.body = Bodies.rectangle(this.x + this.ox, this.y + this.oy, this.w, this.h, {
                     label: 'shotgun',
                     collisionFilter: {  category: 0 }, 
                     density: 0.05, 
@@ -70,7 +87,7 @@ class Gun {
 
             case 3:
             case 'rifle': 
-                this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+                this.body = Bodies.rectangle(this.x + this.ox, this.y + this.oy, this.w, this.h, {
                     label: 'shotgun',
                     collisionFilter: {  category: 0 }, 
                     density: 0.05, 
@@ -93,6 +110,18 @@ class Gun {
                 console.log("gun type %d unknow", this.type)
         }
 
+        this.hand = Constraint.create({
+            bodyA: this.parent,
+            pointA: {x : this.body.position.x - this.parent.position.x , y: this.body.position.y - this.parent.position.y },
+            bodyB: this.body,
+            pointB: {x : 0, y: 0},
+            stiffness: 0.1,
+            damping: 0.1,
+            render: {
+                visible: false
+            }
+        });
+        Composite.add(this.world, this.hand);
     };
 
     shootCoolDowntimer() {
@@ -112,7 +141,7 @@ class Gun {
             var dispX = (i - this.nbBulletPerShot / 2 ) * 10 * Math.cos(this.lookAt);
             var dispY = (i - this.nbBulletPerShot / 2 ) * 10 * Math.sin(this.lookAt);
             this.bullet.push(Bodies.rectangle(this.body.position.x + dispX, this.body.position.y +  dispY, 5, 10, {
-                collisionFilter: {  category: CATEGORY_BULLET, mask: MASK_BULLET }, 
+                collisionFilter: {  category: this.category, mask: this.mask }, 
                 density: 0.05, 
                 frictionAir: 0.001, 
                 isStatic: false , 
@@ -168,6 +197,7 @@ class Gun {
     }
 
     throw() {
+        Composite.remove(this.world, this.hand);
         Body.applyForce(this.body, {
             x: this.body.position.x,
             y: this.body.position.y

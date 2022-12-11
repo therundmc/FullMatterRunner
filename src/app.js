@@ -15,27 +15,31 @@ var Engine = Matter.Engine,
 
 
 // Define collisions mask
-        CATEGORY_PLAYER             = 0b0000000001,
-        CATEGORY_ENEMY              = 0b0000000010,
-        CATEGORY_FLOORMAP           = 0b0000000100,
-        CATEGORY_WALLMAP            = 0b0000001000,
-        CATEGORY_DYNMAP             = 0b0000010000,
-        CATEGORY_BULLET             = 0b0000100000,
-        CATEGORY_PARTICLES          = 0b0001000000,
-        CATEGORY_OBJECTS            = 0b0010000000,
-        CATEGORY_BLOOD              = 0b0100000000,
-        CATEGORY_FLOOR_DETECTOR     = 0b1000000000;
+        CATEGORY_PLAYER             = 0b000000000001,
+        CATEGORY_ENEMY              = 0b000000000010,
+        CATEGORY_FLOORMAP           = 0b000000000100,
+        CATEGORY_WALLMAP            = 0b000000001000,
+        CATEGORY_DYNMAP             = 0b000000010000,
+        CATEGORY_BULLET             = 0b000000100000,
+        CATEGORY_PARTICLES          = 0b000001000000,
+        CATEGORY_OBJECTS            = 0b000010000000,
+        CATEGORY_BLOOD              = 0b000100000000,
+        CATEGORY_FLOOR_DETECTOR     = 0b001000000000,
+        CATEGORY_RAY                = 0b010000000000,
+        CATEGORY_ENEMY_BULLET       = 0b100000000000;
 
-const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_BULLET + CATEGORY_OBJECTS,    
+const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_BULLET + CATEGORY_OBJECTS + CATEGORY_ENEMY_BULLET,    
         MASK_ENEMY      = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLES + CATEGORY_PLAYER + CATEGORY_BULLET,    
         MASK_FLOORMAP   = CATEGORY_FLOOR_DETECTOR,
-        MASK_WALLMAP    = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_BULLET + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_OBJECTS + CATEGORY_BLOOD,
-        MASK_DYNMAP     = CATEGORY_PLAYER + CATEGORY_WALLMAP + CATEGORY_BULLET + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_OBJECTS + CATEGORY_BLOOD,
+        MASK_WALLMAP    = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_BULLET + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_OBJECTS + CATEGORY_BLOOD + CATEGORY_RAY + CATEGORY_ENEMY_BULLET,
+        MASK_DYNMAP     = CATEGORY_PLAYER + CATEGORY_WALLMAP + CATEGORY_BULLET + CATEGORY_PARTICLES + CATEGORY_ENEMY + CATEGORY_OBJECTS + CATEGORY_BLOOD + CATEGORY_ENEMY_BULLET,
         MASK_BULLET     = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_ENEMY + CATEGORY_PARTICLES,
         MASK_PARTICLES  = CATEGORY_PLAYER + CATEGORY_WALLMAP + CATEGORY_DYNMAP+ CATEGORY_ENEMY,
         MASK_OBJECTS    = CATEGORY_PLAYER + CATEGORY_DYNMAP + CATEGORY_WALLMAP,
         MASK_BLOOD      = CATEGORY_DYNMAP + CATEGORY_WALLMAP,
-        MASK_FLOOR_DETECTOR = CATEGORY_FLOORMAP;
+        MASK_FLOOR_DETECTOR = CATEGORY_FLOORMAP,
+        MASK_RAY        = CATEGORY_WALLMAP,
+        MASK_ENEMY_BULLET  = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PLAYER;
 
 
 // get windows size
@@ -147,15 +151,14 @@ var player  = new Player(400, 1750, 51, 29, './assets/img/patrick.png', engine.w
 
 // Ennemy Class var
 var thug = new Array();
-thug.push(new Enemy(300, 700, 80, 80, './assets/img/thug/thug.png', 1, engine.world));
-thug.push(new Enemy(200, 200, 80, 80, './assets/img/thug/thug.png', 2,engine.world));
-thug.push(new Enemy(1000, 1000, 80, 80, './assets/img/thug/thug.png', 3, engine.world));
+thug.push(new Enemy(300, 700, 51, 29, './assets/img/thug/thug.png', 1, engine.world));
+// thug.push(new Enemy(200, 200, 51, 29, './assets/img/thug/thug.png', 2,engine.world));
+// thug.push(new Enemy(1000, 1000, 51, 29, './assets/img/thug/thug.png', 3, engine.world));
 
-thug.push(new Enemy(800, 500, 80, 80, './assets/img/thug/thug.png', 4, engine.world));
-thug.push(new Enemy(100, 1500, 80, 80, './assets/img/thug/thug.png', 5, engine.world));
+thug.push(new Enemy(800, 500, 51, 29, './assets/img/thug/thug.png', 4, engine.world));
 
-// thug.push(new Enemy(1200, 200, 80, 80, './assets/img/thug/thug.png', 6, engine.world));
-// thug.push(new Enemy(1000, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
+thug.push(new Enemy(1200, 200, 80, 80, './assets/img/thug/thug.png', 6, engine.world));
+thug.push(new Enemy(1000, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
 
 // Text Class var
 var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),
@@ -246,7 +249,8 @@ Matter.Events.on(engine, "beforeUpdate", event => {
 
 function handleCollisonWithBulletDestruction() {
 
-    var collisionArray = [...getCollisionArray(CATEGORY_DYNMAP, CATEGORY_BULLET)];
+    var collisionArray = [...getCollisionArray(CATEGORY_DYNMAP, CATEGORY_BULLET), 
+        ... getCollisionArray(CATEGORY_DYNMAP, CATEGORY_ENEMY_BULLET)];
 
     for(i = 0; i < collisionArray.length; i++) {
 
@@ -257,6 +261,17 @@ function handleCollisonWithBulletDestruction() {
         applyForceToParticles(particles, bullet);
 
         Composite.remove(world, body);
+        Composite.remove(world, bullet);
+    }
+
+    var collisionArray = [...getCollisionArray(CATEGORY_WALLMAP, CATEGORY_BULLET),
+        ... getCollisionArray(CATEGORY_WALLMAP, CATEGORY_ENEMY_BULLET)];
+
+    for(i = 0; i < collisionArray.length; i++) {
+
+        var body = collisionArray[i].bodyA;
+        var bullet = collisionArray[i].bodyB;
+
         Composite.remove(world, bullet);
     }
 };
@@ -279,7 +294,7 @@ function handleCollisonWithBulletDismemberment() {
 
         updateFloorWithBlood(ennemy);
 
-        thug[findEnnemyByLabel(ennemy.label)].kill();
+        thug[findEnnemyByLabel(ennemy.label)].die();
         Composite.remove(world, bullet);
 
         var triggerSlowMo = Common.random(0,1)
@@ -324,6 +339,7 @@ function handleCollisonWithPickableObjects() {
     }
 };
 
+// to be move to gun class
 function updateBulletCounter() {
     if (player.isArmed()) {
         var ammoLeft = player.getAmmoLeft();
@@ -341,6 +357,5 @@ function updateBulletCounter() {
 function moveThug() {
     thug.forEach(item => {
         item.Ai(player.body);
-        //item.moveRandom();
     })
 };

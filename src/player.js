@@ -11,7 +11,6 @@ class Player {
         this.body;
         this.lookAt = 0;
         this.gun = 0;
-        this.hand;
 
         this.prevDir = 0;
 
@@ -84,31 +83,10 @@ class Player {
             return;
         }
 
-        var ox = (Math.cos(this.lookAt - Math.PI/2) * 30);
-        var oy = (Math.sin(this.lookAt - Math.PI/2) * 30);
-        if (Math.abs(ox) > Math.abs(oy)) {
-            oy += 15;
-        }
-        else {
-            ox += 15;
-        }
-        this.gun = new Gun(this.body.position.x + ox, this.body.position.y + oy, 8, 32, gunType, this.lookAt, this.world);
-        this.hand = Constraint.create({
-            bodyA: this.body,
-            pointA: {x : ox, y: oy},
-            bodyB: this.gun.body,
-            pointB: {x : 0, y: 0},
-            stiffness: 0.1,
-            damping: 0.1,
-            render: {
-                visible: false
-            }
-        });
-        Composite.add(this.world, this.hand);
+        this.gun = new Gun(this.body.position.x, this.body.position.y, 8, 32, gunType, this.lookAt, this.body, CATEGORY_BULLET, MASK_BULLET, this.world);
     }
 
     dropGun() {
-        Composite.remove(this.world, this.hand);
         this.gun.throw();
         this.gun = 0;
     }

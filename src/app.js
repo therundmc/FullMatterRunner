@@ -46,7 +46,7 @@ const   MASK_PLAYER     = CATEGORY_DYNMAP + CATEGORY_WALLMAP + CATEGORY_PARTICLE
 var windowWidht = window.innerWidth;
 var windowHeight = window.innerHeight;
 
-const cameraPadding = Matter.Vector.create(windowWidht*0.9, windowHeight*0.9); 
+const cameraPadding = Matter.Vector.create(windowWidht*0.5, windowHeight*0.5); 
 
 var gunFire = document.getElementById('gunFire');
     

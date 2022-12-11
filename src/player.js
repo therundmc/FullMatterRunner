@@ -11,6 +11,7 @@ class Player {
         this.body;
         this.lookAt = 0;
         this.gun = 0;
+        this.alive = true;
 
         this.prevDir = 0;
 
@@ -19,6 +20,7 @@ class Player {
 
     draw() {
         this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
+            label: 'player',
             collisionFilter: {  category: this.category, mask: this.mask}, 
             density: 0.05, 
             frictionAir: 0.8, 
@@ -101,6 +103,15 @@ class Player {
         if (this.gun != 0) {
             this.gun.reload();
         }
+    }
+
+    die() {
+        this.alive = false;
+        if (this.gun != 0) {
+            this.gun.throw();
+        }
+        Composite.remove(this.world, this.body);
+        //Composite.remove(this.world, this.hand);
     }
 
     getLastBullet() {

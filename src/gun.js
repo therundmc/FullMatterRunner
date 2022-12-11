@@ -28,6 +28,8 @@ class Gun {
         this.FireRate = 0;
         this.recul = 0;
 
+        this.last =  new Date().getTime();
+
         this.draw();
     }
 
@@ -40,8 +42,6 @@ class Gun {
         else {
             this.ox += 20;
         }
-
-        console.log(this.ox, this.oy)
         switch(this.type) {
             case 1:
             case 'gun': 
@@ -124,14 +124,14 @@ class Gun {
         Composite.add(this.world, this.hand);
     };
 
-    shootCoolDowntimer() {
-        coolDown = false;
-    } 
-
     shoot() {
-        if (coolDown || this.ammoLeft < 1) {
+        var now = new Date().getTime();
+        var delta = now - this.last;
+        if (delta < this.FireRate || this.ammoLeft < 1) {
             return;
         }
+
+        this.last = now;
 
         //gunFire.play(); 
         this.ammoLeft--;
@@ -172,7 +172,7 @@ class Gun {
 
         // douille
         this.douille.push(Bodies.rectangle(this.body.position.x, this.body.position.y, 2, 4, { 
-            collisionFilter: {  category: 0 }, 
+            collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES },
             frictionAir: 0.1, 
             density: 0.1,
             render: { sprite: { texture: './assets/img/douille.png', xScale:1, yScale:1 }
@@ -189,11 +189,6 @@ class Gun {
             y: lastDouille.position.y
             },  {x: fox, y: foy}
         );
-
-        if (!coolDown) {
-            setTimeout(this.shootCoolDowntimer, this.FireRate);
-            coolDown = true;
-        }
     }
 
     throw() {

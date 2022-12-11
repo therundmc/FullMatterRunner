@@ -78,7 +78,7 @@ class Ray {
                 label: this.label,
                 isSensor: true,
                 collisionFilter: {  category: this.category, mask: this.mask },
-                render: { fillStyle: '#FFFFFF', opacity: 0.1 }
+                render: { fillStyle: '#FFFFFF', opacity: 0.05 }
         });
         Body.setCentre(this.ray, Matter.Vector.neg(this.triangleCenter), true);
         Composite.add(this.world, this.ray);
@@ -102,13 +102,12 @@ class Ray {
         this.h = this.sh;
         this.#calculateTriangle();
         this.#create();
-
         Body.setAngle(this.ray, this.lookAt);
 
         var distance = new Array();
         array.forEach(element => {
             if  (element.bodyB.label == this.label) {
-                distance.push(this.getDistance(element.bodyA.position.x, element.bodyA.position.y, element.bodyB.position.x, element.bodyB.position.y));
+                distance.push(this.#getDistance(element.bodyA.position.x, element.bodyA.position.y, element.bodyB.position.x, element.bodyB.position.y));
             }
         });
 
@@ -121,8 +120,7 @@ class Ray {
         }
     }
 
-
-    getDistance(x1, y1, x2, y2){
+    #getDistance(x1, y1, x2, y2){
         let y = x2 - x1;
         let x = y2 - y1;
         

@@ -40,7 +40,7 @@ function generateParticles(body, w, h, col, row) {
         var imgPiecePath = 0;
     }
    
-    var particlesBig = Composites.stack(body.position.x, body.position.y, 2, 1, 0, 0, function(x, y) {
+    var particlesBig = Composites.stack(body.position.x, body.position.y, 2, 2, 0, 0, function(x, y) {
     return Bodies.rectangle(x, y, 20, 20, {
         collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES},
         frictionAir : 0.02,
@@ -54,7 +54,7 @@ function generateParticles(body, w, h, col, row) {
     });
     Composite.add(world, particlesBig);
 
-    var particlesLittle = Composites.stack(body.position.x, body.position.y, 6, 6, 0, 0, function(x, y) {
+    var particlesLittle = Composites.stack(body.position.x, body.position.y, 4, 4, 0, 0, function(x, y) {
         return Bodies.rectangle(x, y, 5, 5, {
             collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES},
             frictionAir : 0.01,
@@ -152,7 +152,7 @@ function applyForceToBloodParticles(bloodParticles) {
 
 
 function updateFloorWithBlood(body) {
-    detectorBody = Bodies.rectangle(body.position.x, body.position.y, 50, 50, {
+    detectorBody = Bodies.rectangle(body.position.x, body.position.y, 100, 100, {
         collisionFilter: {  category: CATEGORY_FLOOR_DETECTOR, mask: MASK_FLOOR_DETECTOR },
         render: {
             opacity: 0.0
@@ -164,13 +164,15 @@ function updateFloorWithBlood(body) {
 
     if (collisionArray.length > 0) {
 
-        var map = collisionArray[i].bodyA;
-
-        imgPath = '';
-        imgPath = map.render.sprite.texture;
-        imgFloorBloodPath = imgPath.slice(0, imgPath.length - 4)  + "_blood" + imgPath.slice(imgPath.length - 4);
-        console.log(imgFloorBloodPath)
-        map.render.sprite.texture = imgFloorBloodPath;
+        for (var i = 0; i < collisionArray.length; i++) {
+            var map = collisionArray[i].bodyA;
+            imgNumber = (i + 1) % 5;
+            imgPath = '';
+            imgPath = map.render.sprite.texture;
+            imgFloorBloodPath = imgPath.slice(0, imgPath.length - 4)  + "_blood" + imgNumber + imgPath.slice(imgPath.length - 4);
+            console.log(imgFloorBloodPath)
+            map.render.sprite.texture = imgFloorBloodPath;
+        }
     }
 
     Composite.remove(world, detectorBody);

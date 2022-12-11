@@ -147,7 +147,7 @@ var floorMap    = new Map(0, 0, floorMapArray, 0, engine.world),
     DynMap      = new Map(0, 0, DynMapArray, 2, engine.world);
 
 // Player Class var
-var player  = new Player(400, 1750, 51, 29, './assets/img/patrick.png', engine.world);
+var player  = new Player(400, 1750, 51, 29, './assets/img/player/player.png', engine.world);
 
 // Ennemy Class var
 var thug = new Array();
@@ -158,7 +158,7 @@ thug.push(new Enemy(300, 700, 51, 29, './assets/img/thug/thug.png', 1, engine.wo
 thug.push(new Enemy(800, 500, 51, 29, './assets/img/thug/thug.png', 4, engine.world));
 
 thug.push(new Enemy(1200, 200, 80, 80, './assets/img/thug/thug.png', 6, engine.world));
-thug.push(new Enemy(1000, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
+thug.push(new Enemy(800, 450, 80, 80, './assets/img/thug/thug.png', 7, engine.world));
 
 // Text Class var
 var help    = new Txt("Press 'E' to pick a gun", 300, 1570, 24, "white", world),
@@ -243,9 +243,14 @@ Matter.Events.on(engine, "beforeUpdate", event => {
 
     handleCollisonWithBulletDestruction();
     handleCollisonWithBulletDismemberment();
+    handleCollisonWithBulletAndPlayer();
     updateBulletCounter();
     updateAnglePlayerMouse();
 });
+
+function gameOver() {
+    Runner.stop(runner, engine);
+}
 
 function handleCollisonWithBulletDestruction() {
 
@@ -302,6 +307,35 @@ function handleCollisonWithBulletDismemberment() {
             setTimeout(startSlowMo, 0);
             setTimeout(stopSlowMo, 600);
         } 
+    }
+};
+
+function handleCollisonWithBulletAndPlayer() {
+
+    var collisionArray = [...getCollisionArray(CATEGORY_PLAYER, CATEGORY_ENEMY_BULLET)];
+
+    for(i = 0; i < collisionArray.length; i++) {
+
+        var playerBody = collisionArray[i].bodyA;
+        var bullet = collisionArray[i].bodyB;
+
+        bodiesElement = generateDismemberment(playerBody);
+        applyForceToBodyPieces(bodiesElement, bullet);
+
+        // bloodParticles = generateBlood(playerBody);
+        // applyForceToBloodParticles(bloodParticles);
+
+        updateFloorWithBlood(playerBody);
+
+        player.die();
+        setTimeout(gameOver, 1000);
+
+        Composite.remove(world, bullet);
+
+
+
+        setTimeout(startSlowMo, 0);
+        setTimeout(stopSlowMo, 600);
     }
 };
 

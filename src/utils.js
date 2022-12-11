@@ -76,17 +76,29 @@ function generateDismemberment(body) {
 
     var bodiesElement = new Array();
     var imgPath = body.render.sprite.texture; 
-    var pieceNumber = 0;
     var imgPiecePath = "";
 
-    for (var i = 0; i < 4; i++) {
-        pieceNumber = i + 1;
-        imgPiecePath = imgPath.slice(0, imgPath.length - 4)  + "_piece" + pieceNumber + imgPath.slice(imgPath.length - 4);
+    for (var i = 0; i < 6; i++) {
+        if (i == 0 || i == 1){
+            imgPiecePath = imgPath.slice(0, imgPath.length - 4)  + "_arm" + imgPath.slice(imgPath.length - 4);
+        }
+        if (i == 2 || i == 3) {
+            imgPiecePath = imgPath.slice(0, imgPath.length - 4)  + "_leg" + imgPath.slice(imgPath.length - 4);
+        }
+        if (i == 4) {
+            imgPiecePath = imgPath.slice(0, imgPath.length - 4)  + "_body" + imgPath.slice(imgPath.length - 4);
+        }
+        if (i == 5) {
+            imgPiecePath = imgPath.slice(0, imgPath.length - 4)  + "_head" + imgPath.slice(imgPath.length - 4);
+        }
+
+
+        console.log(imgPiecePath)
         bodiesElement.push(Bodies.rectangle(body.position.x, body.position.y, 50, 50, {
             collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES},
             frictionAir: 0.1, 
             isStatic: false , 
-            render: { sprite: { texture: imgPiecePath }}
+            render: { sprite: { texture: imgPiecePath, xScale:0.9, yScale: 0.9}}
             }));
     }
     Composite.add(world, bodiesElement);
@@ -96,15 +108,15 @@ function generateDismemberment(body) {
 
 
 function generateBlood(body) {
-    var bloodParticles = Composites.stack(body.position.x, body.position.y, 2, 2, 0, 0, function(x, y) {
+    var bloodParticles = Composites.stack(body.position.x, body.position.y, 5, 5, 0, 0, function(x, y) {
         return Bodies.rectangle(x, y, 5, 5, {
             collisionFilter: {  category: CATEGORY_BLOOD, mask: MASK_BLOOD },
             frictionAir : 0.1,
             render: {
                 opacity: 1,
                 sprite: { texture: 'assets/img/blood.png',
-                    xScale: Common.random(1, 1.2),
-                    yScale: Common.random(1, 1.2) },
+                    xScale: Common.random(0.2, 1.2),
+                    yScale: Common.random(0.2, 1.2) },
                 }
             });
         }); 
@@ -165,7 +177,16 @@ function updateFloorWithBlood(body) {
     if (collisionArray.length > 0) {
 
         for (var i = 0; i < collisionArray.length; i++) {
-            var map = collisionArray[i].bodyA;
+            if (collisionArray[i].bodyA.collisionFilter.category == CATEGORY_FLOORMAP) {
+                var map = collisionArray[i].bodyA;
+            }
+            else if (collisionArray[i].bodyB.collisionFilter.category == CATEGORY_FLOORMAP) {
+                var map = collisionArray[i].bodyB;
+            }
+            else {
+                break;
+            }
+
             imgNumber = (i + 1) % 5;
             imgPath = '';
             imgPath = map.render.sprite.texture;

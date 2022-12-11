@@ -16,6 +16,7 @@ class Gun {
         this.hand;
         this.douille = new Array;
         this.bullet = new Array;
+        this.sound;
 
         this.ox = 0;
         this.oy = 0;
@@ -60,8 +61,18 @@ class Gun {
                 this.ammoCapacity = 13;
                 this.ammoLeft = this.ammoCapacity;
                 this.nbBulletPerShot = 1;
-                this.FireRate = 200;
+                this.FireRate = 500;
                 this.recul = 1.5;
+                this.sound = new Howl({
+                    src: ['./assets/sound/gunshot.mp3'],
+                    sprite: {
+                      shot1: [0, 400],
+                      shot2: [1000, 1400],
+                      shot3: [2000, 2400],
+                      shot4: [3000, 3400],
+                      reload: [0, 600],
+                    }
+                  });
                 break;
 
             case 2:
@@ -83,6 +94,16 @@ class Gun {
                 this.nbBulletPerShot = 5;
                 this.FireRate = 1000;
                 this.recul = 5;
+                this.sound = new Howl({
+                    src: ['./assets/sound/shotgunshot.mp3'],
+                    sprite: {
+                      shot1: [0, 400],
+                      shot2: [1000, 2000],
+                      shot3: [2000, 3000],
+                      shot4: [3000, 4000],
+                      reload: [0, 600],
+                    }
+                  });
                 break;
 
             case 3:
@@ -102,8 +123,18 @@ class Gun {
                 this.ammoCapacity = 30;
                 this.ammoLeft = this.ammoCapacity;
                 this.nbBulletPerShot = 1;
-                this.FireRate = 120;
+                this.FireRate = 140;
                 this.recul = 1.5;
+                this.sound = new Howl({
+                    src: ['./assets/sound/AKshot.mp3'],
+                    sprite: {
+                      shot1: [0, 400],
+                      shot2: [1000, 1400],
+                      shot3: [2000, 2400],
+                      shot4: [3000, 3400],
+                      reload: [0, 600],
+                    }
+                  });
                 break;
 
             default:
@@ -124,16 +155,23 @@ class Gun {
         Composite.add(this.world, this.hand);
     };
 
+    playShootSound() {
+        var rand = Math.round(Common.random(1,4));
+        var shotId = 'shot' + rand;
+        this.sound.stop();
+        this.sound.play(shotId);
+    }
+
     shoot() {
         var now = new Date().getTime();
         var delta = now - this.last;
         if (delta < this.FireRate || this.ammoLeft < 1) {
             return;
         }
-
         this.last = now;
 
-        //gunFire.play(); 
+        this.playShootSound();
+
         this.ammoLeft--;
         this.bullet = [];
         // bullet

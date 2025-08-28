@@ -1,4 +1,6 @@
-class Txt {
+const { Bodies, Body, Composite } = (typeof Matter !== 'undefined') ? Matter : window.Matter;
+
+export default class Txt {
     constructor(text, x, y, size, color, world) {
         this.text = text; 
         this.x = x;
@@ -38,4 +40,5 @@ class Txt {
         Composite.remove(this.world, this.body);
     }
 
-} 
+}
+// end of Txt module

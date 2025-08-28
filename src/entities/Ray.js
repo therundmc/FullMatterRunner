@@ -1,5 +1,6 @@
+const { Bodies, Body, Composite, Constraint, Vector } = (typeof Matter !== 'undefined') ? Matter : window.Matter;
 
-class Ray {
+export default class Ray {
     constructor(originBody, angle, h, label, world) {
         this.originBody = originBody;
         this.world = world;

@@ -1,4 +1,8 @@
-class Player {
+const { Bodies, Body, Composite, Vector } = (typeof Matter !== 'undefined') ? Matter : window.Matter;
+import GameState from '../core/GameState.js';
+import Gun from './Gun.js';
+
+export default class Player {
     constructor(x, y, w, h, asset, world) {
         this.x = x;
         this.y = y;
@@ -22,8 +26,8 @@ class Player {
         this.body = Bodies.rectangle(this.x, this.y, this.w, this.h, {
             label: 'player',
             collisionFilter: {  category: this.category, mask: this.mask}, 
-            density: 0.05, 
-            frictionAir: 0.8, 
+            density: 0.1, 
+            frictionAir: 1, 
             isStatic: false , 
             render: { sprite: { texture: this.asset }}
             });
@@ -33,40 +37,17 @@ class Player {
     };
 
     move(x, y) {
+        if (GameState.isGameOver) return;
         Matter.Body.applyForce(this.body, {
             x: this.body.position.x,
             y: this.body.position.y
             }, {x: x, y: y})
     };
 
-    moveRight(f = 1) {
-        Matter.Body.applyForce(this.body, {
-            x: this.body.position.x,
-            y: this.body.position.y
-            }, {x: f, y: 0})
-    }
-
-    moveLeft(f = 1) {
-        Matter.Body.applyForce(this.body, {
-            x: this.body.position.x,
-            y: this.body.position.y
-            }, {x: -f, y: 0})
-    }
-
-    moveUp(f = 1) {
-        Matter.Body.applyForce(this.body, {
-            x: this.body.position.x,
-            y: this.body.position.y
-            }, {x: 0, y: -f})
-    }
-
-    moveDown(f = 1) {
-        Matter.Body.applyForce(this.body, {
-            x: this.body.position.x,
-            y: this.body.position.y
-            }, {x: 0, y: f})
-    }
-
+    moveRight(f = 1) { this.move(f, 0); }
+    moveLeft(f = 1) { this.move(-f, 0); }
+    moveUp(f = 1) { this.move(0, -f); }
+    moveDown(f = 1) { this.move(0, f); }
 
     rotate() {
         Body.setAngle(this.body, this.lookAt);
@@ -89,7 +70,7 @@ class Player {
     }
 
     dropGun() {
-        this.gun.throw();
+        if (this.gun != 0) this.gun.throw();
         this.gun = 0;
     }
 
@@ -105,13 +86,24 @@ class Player {
         }
     }
 
-    die() {
+    die(freezeOnly = false) {
         this.alive = false;
         if (this.gun != 0) {
             this.gun.throw();
         }
-        Composite.remove(this.world, this.body);
-        //Composite.remove(this.world, this.hand);
+        // if freezeOnly requested, keep the body but make it static and highly damped
+        if (freezeOnly && this.body) {
+            try {
+                Body.setStatic(this.body, true);
+                this.body.frictionAir = 1.0;
+                // optionally play a small visual effect by reducing opacity
+                if (this.body.render && this.body.render.sprite) {
+                    this.body.render.opacity = 0.6;
+                }
+            } catch(e) { console.debug('Player.freeze error', e); }
+        } else {
+            Composite.remove(this.world, this.body);
+        }
     }
 
     getLastBullet() {
@@ -140,9 +132,7 @@ class Player {
     }
 
     isArmed() {
-        if (this.gun != 0) {
-            return true;
-        }
-        return false;
+        return this.gun != 0;
     }
 }
+// end of Player module

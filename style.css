@@ -4,8 +4,25 @@ html, body {
 }
 
 body {
-  position: absolute;
+  position: relative;
   text-align: center;
+  background: #000000; /* page background */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#game-root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-canvas-container {
+  width: 1024px;
+  height: 768px;
+  display: inline-block;
 }
 
 @font-face {
@@ -36,3 +53,8 @@ body {
   text-shadow: 2px 2px 6px #000000;
   pointer-events: none;
 }
+
+/* blur the canvas when game is over */
+body.game-over canvas { filter: blur(4px) saturate(0.6); }
+/* overlay should accept pointer events so keyboard focus works */
+#game-over-overlay { pointer-events: auto; }

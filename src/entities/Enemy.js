@@ -1,7 +1,12 @@
+const { Bodies, Body, Composite, Vector, Common } = (typeof Matter !== 'undefined') ? Matter : window.Matter;
+import GameState from '../core/GameState.js';
+import Gun from './Gun.js';
+import Ray from './Ray.js';
+
 const IDLE = 0;
 const ALARM = 1;
 
-class Enemy {
+export default class Enemy {
     constructor(x, y, w, h, asset, label, world) {
         this.x = x;
         this.y = y;
@@ -15,7 +20,7 @@ class Enemy {
         this.body;
         this.fov;
         this.constraitFov;
-        this.dir = Matter.Vector.create(1, 0);
+        this.dir = Vector.create(1, 0);
         this.lookAt = 0;
         this.gun = 0;
         this.prevAngle = 0;
@@ -43,9 +48,8 @@ class Enemy {
     };
 
     Ai(player) {
-        if (!this.alive) {
-            return;
-        }
+    if (GameState.isGameOver) return;
+        if (!this.alive) return;
 
         switch(this.state) {
             case IDLE:
@@ -93,9 +97,9 @@ class Enemy {
                 if (dir > 0.3){
                     this.dir = item.tangent;
                 } else if (dir > 0.6) {
-                    this.dir = Matter.Vector.neg(item.tangent);
+                    this.dir = Vector.neg(item.tangent);
                 } else {
-                    this.dir = Matter.Vector.neg(item.normal);
+                    this.dir = Vector.neg(item.normal);
                 }
             }
         }
@@ -162,7 +166,8 @@ class Enemy {
     rotate(angle) {
         this.lookAt = angle;
         Body.setAngle(this.body, this.lookAt + Math.PI/2);
-        this.fov.rotate(this.lookAt, player);
+    // pass the current player body (compat with legacy global 'player')
+    this.fov.rotate(this.lookAt, window.player?.body);
         if (this.gun != 0) {
             this.gun.rotate(this.lookAt + Math.PI/2);
         }
@@ -173,6 +178,6 @@ class Enemy {
         this.fov.destroy();
         this.gun.throw();
         Composite.remove(this.world, this.body);
-        //Composite.remove(this.world, this.hand);
     }
 }
+// end of Enemy module

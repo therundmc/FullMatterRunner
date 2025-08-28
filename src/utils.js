@@ -1,7 +1,8 @@
+const { Detector, Composite, Bodies, Composites, Common } = (typeof Matter !== 'undefined') ? Matter : window.Matter;
 
-function getCollisionArray(categoryA, categoryB) {
-    var bodiesA = getAllBodiesFilterdByCategory(categoryA);
-    var bodiesB = getAllBodiesFilterdByCategory(categoryB);
+export function getCollisionArray(categoryA, categoryB) {
+    var bodiesA = getAllBodiesFilterdByCategory(categoryA) || [];
+    var bodiesB = getAllBodiesFilterdByCategory(categoryB) || [];
     var bodiesAB = [...bodiesA, ...bodiesB];
 
     var detector = Detector.create();
@@ -12,12 +13,12 @@ function getCollisionArray(categoryA, categoryB) {
 }
 
 
-function getAllBodiesFilterdByCategory(category){
-    var bodies = Composite.allBodies(world);
+export function getAllBodiesFilterdByCategory(category){
+    var bodies = Composite.allBodies(window.world || (window.engine && window.engine.world));
     var bodiesFiltered = new Array;
 
-    if (bodies.length < 1) {
-        return;
+    if (!bodies || bodies.length < 1) {
+        return [];
     }
 
     for (let i = 0; i < bodies.length; i++){
@@ -29,9 +30,9 @@ function getAllBodiesFilterdByCategory(category){
 }
 
 
-function generateParticles(body, w, h, col, row) {
+export function generateParticles(body, w, h, col, row) {
 
-    if (body.render.sprite.texture) {
+    if (body.render && body.render.sprite && body.render.sprite.texture) {
         var pieceNumber = Math.round(Common.random(1,4));
         var imgPath = body.render.sprite.texture;
         var imgPiecePath =  imgPath.slice(0, imgPath.length - 4)  + "_piece" + pieceNumber + imgPath.slice(imgPath.length - 4);
@@ -52,7 +53,7 @@ function generateParticles(body, w, h, col, row) {
             }
         });
     });
-    Composite.add(world, particlesBig);
+    Composite.add(window.world, particlesBig);
 
     var particlesLittle = Composites.stack(body.position.x, body.position.y, 4, 4, 0, 0, function(x, y) {
         return Bodies.rectangle(x, y, 5, 5, {
@@ -66,16 +67,16 @@ function generateParticles(body, w, h, col, row) {
                 }
             });
         }); 
-    Composite.add(world, particlesLittle);
+    Composite.add(window.world, particlesLittle);
 
     return [...particlesBig.bodies, ...particlesLittle.bodies];
 }
 
 
-function generateDismemberment(body) {
+export function generateDismemberment(body) {
 
     var bodiesElement = new Array();
-    var imgPath = body.render.sprite.texture; 
+    var imgPath = body.render && body.render.sprite ? body.render.sprite.texture : '';
     var imgPiecePath = "";
 
     for (var i = 0; i < 6; i++) {
@@ -92,8 +93,6 @@ function generateDismemberment(body) {
             imgPiecePath = imgPath.slice(0, imgPath.length - 4)  + "_head" + imgPath.slice(imgPath.length - 4);
         }
 
-
-        console.log(imgPiecePath)
         bodiesElement.push(Bodies.rectangle(body.position.x, body.position.y, 50, 50, {
             collisionFilter: {  category: CATEGORY_PARTICLES, mask: MASK_PARTICLES},
             frictionAir: 0.1, 
@@ -101,13 +100,13 @@ function generateDismemberment(body) {
             render: { sprite: { texture: imgPiecePath, xScale:0.9, yScale: 0.9}}
             }));
     }
-    Composite.add(world, bodiesElement);
+    Composite.add(window.world, bodiesElement);
 
     return bodiesElement;
 }
 
 
-function generateBlood(body) {
+export function generateBlood(body) {
     var bloodParticles = Composites.stack(body.position.x, body.position.y, 5, 5, 0, 0, function(x, y) {
         return Bodies.rectangle(x, y, 5, 5, {
             collisionFilter: {  category: CATEGORY_BLOOD, mask: MASK_BLOOD },
@@ -120,13 +119,13 @@ function generateBlood(body) {
                 }
             });
         }); 
-    Composite.add(world, bloodParticles);
+    Composite.add(window.world, bloodParticles);
 
     return bloodParticles.bodies;
 }
 
 
-function applyForceToParticles(particles, bullet) {
+export function applyForceToParticles(particles, bullet) {
     for (let i = 0; i < particles.length; i++) {
         var body = particles[i];
         Matter.Body.applyForce(body, {
@@ -139,7 +138,7 @@ function applyForceToParticles(particles, bullet) {
 } 
 
 
-function applyForceToBodyPieces(pieces, bullet) {
+export function applyForceToBodyPieces(pieces, bullet) {
     for (let i = 0; i < pieces.length; i++) {
         var body = pieces[i];
         Matter.Body.applyForce(body, {
@@ -151,7 +150,7 @@ function applyForceToBodyPieces(pieces, bullet) {
 } 
 
 
-function applyForceToBloodParticles(bloodParticles) {
+export function applyForceToBloodParticles(bloodParticles) {
     for (let i = 0; i < bloodParticles.length; i++) {
         var body = bloodParticles[i];
         Matter.Body.applyForce(body, {
@@ -163,68 +162,91 @@ function applyForceToBloodParticles(bloodParticles) {
 } 
 
 
-function updateFloorWithBlood(body) {
-    detectorBody = Bodies.rectangle(body.position.x, body.position.y, 100, 100, {
+export function updateFloorWithBlood(body) {
+    var detectorBody = Bodies.rectangle(body.position.x, body.position.y, 100, 100, {
         collisionFilter: {  category: CATEGORY_FLOOR_DETECTOR, mask: MASK_FLOOR_DETECTOR },
         render: {
             opacity: 0.0
         }
     });
-    Composite.add(world, detectorBody);
+    Composite.add(window.world, detectorBody);
 
     var collisionArray = [...getCollisionArray(CATEGORY_FLOORMAP, CATEGORY_FLOOR_DETECTOR)]
 
     if (collisionArray.length > 0) {
 
         for (var i = 0; i < collisionArray.length; i++) {
+            var map;
             if (collisionArray[i].bodyA.collisionFilter.category == CATEGORY_FLOORMAP) {
-                var map = collisionArray[i].bodyA;
+                map = collisionArray[i].bodyA;
             }
             else if (collisionArray[i].bodyB.collisionFilter.category == CATEGORY_FLOORMAP) {
-                var map = collisionArray[i].bodyB;
+                map = collisionArray[i].bodyB;
             }
             else {
                 break;
             }
 
-            imgNumber = (i + 1) % 5;
-            imgPath = '';
-            imgPath = map.render.sprite.texture;
-            imgFloorBloodPath = imgPath.slice(0, imgPath.length - 4)  + "_blood" + imgNumber + imgPath.slice(imgPath.length - 4);
-            console.log(imgFloorBloodPath)
+            // pick 1..4 so file names match ground_3_blood1..4.png existing in assets
+            var imgNumber = (Math.floor(Common.random(0, 1) * 4) + 1);
+            var imgPath = map.render.sprite.texture || '';
+            var imgFloorBloodPath = imgPath.slice(0, imgPath.length - 4)  + "_blood" + imgNumber + imgPath.slice(imgPath.length - 4);
             map.render.sprite.texture = imgFloorBloodPath;
         }
     }
 
-    Composite.remove(world, detectorBody);
-
+    Composite.remove(window.world, detectorBody);
 }
 
-
-function updateAnglePlayerMouse() {
-    angle = Matter.Vector.angle(player.getRelativePos(cameraPadding), mouse.position);
-    player.setLookAt(angle + Math.PI / 2);
+export function updateAnglePlayerMouse() {
+    if (!window.player || !window.mouse) return;
+    try {
+        // Use player's world position and mouse world position to compute look angle.
+        // This is more robust than legacy getRelativePos which assumed screen offsets.
+        const playerPos = window.player.body ? window.player.body.position : null;
+        const mousePos = window.mouse.position;
+        if (!playerPos || !mousePos) {
+            // debug: sometimes mouse not initialized yet
+            // console.debug('updateAnglePlayerMouse: missing pos', { playerPos, mousePos });
+            return;
+        }
+        const angle = Matter.Vector.angle(playerPos, mousePos);
+        window.player.setLookAt(angle + Math.PI / 2);
+    } catch (e) {
+        // ignore transient errors during initialization
+    }
 }
 
+export function fts(force) { return force * (1 / ((window.engine && window.engine.timing && window.engine.timing.timeScale) || 1)); }
 
-function fts(force) {
-    return force * (1 / engine.timing.timeScale);
-};
+export function startSlowMo() { if (window.engine && window.engine.timing) window.engine.timing.timeScale = 0.2; }
 
+export function stopSlowMo() { if (window.engine && window.engine.timing) window.engine.timing.timeScale = 1; }
 
-function startSlowMo() {
-    engine.timing.timeScale = 0.2;
-};
-
-
-function stopSlowMo() {
-    engine.timing.timeScale = 1;
-};
-
-function findEnnemyByLabel(label) {
+export function findEnnemyByLabel(label) {
     for (let i = 0; i < thug.length; i++) {
         if (thug[i].body.label == label) {
             return i;
         }
     }
 }
+
+// attach to window for legacy code compatibility
+if (typeof window !== 'undefined') {
+    window.getCollisionArray = getCollisionArray;
+    window.getAllBodiesFilterdByCategory = getAllBodiesFilterdByCategory;
+    window.generateParticles = generateParticles;
+    window.generateDismemberment = generateDismemberment;
+    window.generateBlood = generateBlood;
+    window.applyForceToParticles = applyForceToParticles;
+    window.applyForceToBodyPieces = applyForceToBodyPieces;
+    window.applyForceToBloodParticles = applyForceToBloodParticles;
+    window.updateFloorWithBlood = updateFloorWithBlood;
+    window.updateAnglePlayerMouse = updateAnglePlayerMouse;
+    window.fts = fts;
+    window.startSlowMo = startSlowMo;
+    window.stopSlowMo = stopSlowMo;
+    window.findEnnemyByLabel = findEnnemyByLabel;
+}
+
+export default { getCollisionArray, getAllBodiesFilterdByCategory };

@@ -50,6 +50,40 @@ const cameraPadding = Matter.Vector.create(windowWidht*0.5, windowHeight*0.5);
 
 var gunFire = document.getElementById('gunFire');
     
+// simple game state
+var gameState = {
+    isGameOver: false
+};
+// make accessible to other scripts loaded earlier
+window.gameState = gameState;
+
+function showGameOver() {
+    if (gameState.isGameOver) return;
+    gameState.isGameOver = true;
+
+    // stop physics runner
+    try { Runner.stop(runner); } catch (e) {}
+
+    // stop Howler global sounds if available
+    try { if (window.Howler) Howler.stop(); } catch (e) {}
+
+    // stop any html audio elements
+    try {
+        var audios = document.getElementsByTagName('audio');
+        for (var i = 0; i < audios.length; i++) { audios[i].pause(); audios[i].currentTime = 0; }
+    } catch (e) {}
+
+    // show overlay if present
+    var ov = document.getElementById('game-over-overlay');
+    if (ov) ov.style.display = 'flex';
+}
+
+// reload on 'R'
+document.addEventListener('keydown', function (e) {
+    if (gameState.isGameOver && (e.key === 'r' || e.key === 'R')) {
+        location.reload();
+    }
+});
 // create engine
 var engine = Engine.create(),
     world = engine.world;
@@ -327,8 +361,9 @@ function handleCollisonWithBulletAndPlayer() {
 
         updateFloorWithBlood(playerBody);
 
-        player.die();
-        setTimeout(gameOver, 1000);
+    player.die();
+    // show game over immediately (keep a short delay if you want visuals)
+    setTimeout(showGameOver, 250);
 
         Composite.remove(world, bullet);
 
@@ -389,6 +424,7 @@ function updateBulletCounter() {
 };
 
 function moveThug() {
+    if (gameState.isGameOver) return;
     thug.forEach(item => {
         item.Ai(player.body);
     })
